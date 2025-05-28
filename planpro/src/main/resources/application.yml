@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/planpro
+    url: jdbc:postgresql://localhost:5433/planpro_db
     username: postgres
-    password: postgres
+    password: 12345678
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -22,6 +22,8 @@ jwt:
   public-key: classpath:certs/public-key.pem
   expiration: 86400000 # 24 hours in milliseconds
   issuer: planpro-app
+  secret: mySecretKey
+  expirationMs: 86400000 # 24 hours in milliseconds
 
 logging:
   level:
