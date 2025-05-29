@@ -3,6 +3,7 @@ package com.planprostructure.planpro.domain.users;
 import com.planprostructure.planpro.enums.Role;
 import com.planprostructure.planpro.enums.StatusUser;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -48,5 +49,17 @@ public class Users {
 
     @Column(name = "reset_token_expiry")
     private LocalDateTime resetTokenExpiry;
+
+    @Builder
+    public Users(String username, String password, String email, Role role, String phoneNumber, StatusUser status, LocalDateTime resetTokenExpiry) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.role = role;
+        this.phoneNumber = phoneNumber;
+        this.status = status;
+        this.resetTokenExpiry = resetTokenExpiry;
+    }
+
 
 }

@@ -4,6 +4,6 @@ import com.planprostructure.planpro.payload.auth.AuthRequest;
 import com.planprostructure.planpro.payload.auth.LoginRequest;
 
 public interface AuthService {
-    void register(AuthRequest request);
-    void login(LoginRequest request);
+    void register(AuthRequest request) throws Throwable;
+    Object login(LoginRequest request) throws Throwable;
 }

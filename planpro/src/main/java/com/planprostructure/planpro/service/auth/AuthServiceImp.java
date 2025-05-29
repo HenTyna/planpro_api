@@ -1,15 +1,27 @@
 package com.planprostructure.planpro.service.auth;
 
+import com.planprostructure.planpro.components.common.api.ApiResponse;
+import com.planprostructure.planpro.components.common.api.StatusCode;
 import com.planprostructure.planpro.config.JwtUtil;
+import com.planprostructure.planpro.config.UserAuthenticationProvider;
+import com.planprostructure.planpro.domain.security.SecurityUser;
 import com.planprostructure.planpro.domain.users.UserRepository;
 import com.planprostructure.planpro.domain.users.Users;
 import com.planprostructure.planpro.enums.Role;
 import com.planprostructure.planpro.enums.StatusUser;
+import com.planprostructure.planpro.exception.BusinessException;
 import com.planprostructure.planpro.payload.auth.AuthRequest;
+import com.planprostructure.planpro.payload.auth.AuthResponse;
 import com.planprostructure.planpro.payload.auth.LoginRequest;
+import com.planprostructure.planpro.service.password.PasswordEncryption;
+import com.planprostructure.planpro.utils.PasswordUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -17,30 +29,57 @@ public class AuthServiceImp implements  AuthService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final UserAuthenticationProvider userAuthenticationProvider;
+    private final PasswordEncryption passwordEncryption;
 
     @Override
-    public void register(AuthRequest request) {
+    @Transactional
+    public void register(AuthRequest request) throws Throwable {
         if (userRepository.findByUsername(request.getUsername()).isPresent())
             throw new RuntimeException("Username already exists");
+        String rawPassword;
+        try {
+            rawPassword = passwordEncryption.getPassword(request.getPassword());
+        } catch (Exception e) {
+            throw new BusinessException(StatusCode.PASSWORD_MUST_BE_ENCRYPTED);
+        }
 
-        var user = new Users();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(Role.USER);
-        user.setStatus(StatusUser.ACTIVE);
-
-        userRepository.save(user);
+        var users = Users.builder()
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(rawPassword))
+                .email(request.getEmail())
+                .role(Role.USER)
+                .status(StatusUser.ACTIVE)
+                .build();
+        userRepository.save(users);
     }
 
     @Override
-    public void login(LoginRequest request) {
-        Users user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+    @Transactional
+    public Object login(LoginRequest request) throws Throwable {
+        if (request.getUsername() == null || request.getPassword() == null) {
+            throw new BusinessException(StatusCode.BAD_REQUEST, "Username and password are required");
+        }
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword()))
-            throw new RuntimeException("Invalid credentials");
+        Authentication authentication = userAuthenticationProvider.authenticate(
+                request.getUsername(),
+                request.getPassword()
+        );
 
-        return jwtUtil.generateToken(user.getUsername());
+        SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
+        if (securityUser == null) {
+            throw new BusinessException(StatusCode.AUTHENTICATION_FAILED, "Authentication failed");
+        }
+
+        if (!securityUser.isEnabled()) {
+            throw new BusinessException(StatusCode.USER_DISABLED, "User account is disabled");
+        }
+
+        String token = jwtUtil.doGenerateToken(securityUser);
+        return new AuthResponse(
+                token,
+                "Bearer",
+                jwtUtil.getExpireIn()
+        );
     }
 }

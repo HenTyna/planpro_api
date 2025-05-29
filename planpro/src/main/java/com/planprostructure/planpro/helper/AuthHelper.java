@@ -1,26 +1,63 @@
 package com.planprostructure.planpro.helper;
 
+import com.planprostructure.planpro.domain.security.SecurityUser;
 import com.planprostructure.planpro.domain.users.UserRepository;
 import com.planprostructure.planpro.domain.users.Users;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
 public class AuthHelper {
 
-    private final UserRepository userRepository;
+    public static Authentication getAuth(){
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
 
-    public Users getCurrentUser() {
-        String username = getUsername();
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+    public static String getToken() {
+        Jwt jwt = (Jwt) getAuth().getPrincipal();
+        return jwt.getTokenValue();
+    }
+
+    public static Jwt getJwt(){
+        if(getAuth().getPrincipal() instanceof Jwt){
+            return (Jwt) getAuth().getPrincipal();
+        }
+        return null;
+    }
+
+    public static SecurityUser getSecurityUser(){
+        var authentication = getAuth();
+
+        if(authentication.getPrincipal() instanceof SecurityUser){
+            return ((SecurityUser) getAuth().getPrincipal());
+        }
+
+        return null;
+    }
+
+    public static Users getUser() {
+        SecurityUser securityUser = getSecurityUser();
+        if (securityUser == null) {
+            throw new UsernameNotFoundException("SecurityUser is null");
+        }
+        return securityUser.users();
     }
 
     public static Long getCurrentUserId() {
-        return (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var userId = getUser().getId();
+        if (getUser().getId() != null) {
+             userId = getUser().getId();
+        } else {
+            throw new UsernameNotFoundException("User ID is null");
+        }
+        return userId;
     }
 
     public String getUsername() {

@@ -1,74 +1,82 @@
 package com.planprostructure.planpro.config;
 
+import com.planprostructure.planpro.domain.security.SecurityUser;
+import com.planprostructure.planpro.properties.JwtProperties;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.util.Date;
-import java.util.UUID;
-import java.util.logging.Logger;
+import java.time.Instant;
+import java.util.*;
 
 @Component
+@RequiredArgsConstructor
 public class JwtUtil {
 
-    @Value("${jwt.secret}")
-    private String secret;
+    private final JwtEncoder jwtEncoder;
+    private final JwtProperties jwtConfig;
+    private final JwtDecoder jwtDecoder;
 
-    @Value("${jwt.expirationMs}")
-    private long expirationMs;
+    public long getExpireIn() {
+        return jwtConfig.expiration().getSeconds();
+    }
+    private Instant extractExpiration(String token) {
+        return jwtDecoder.decode(token).getExpiresAt();
+    }
 
-    private volatile Key key;
+    public Map<String, Object> extractAllClaims(String token) {
+        return new LinkedHashMap<>(jwtDecoder.decode(token).getClaims());
+    }
 
-//    private static final Logger log = LoggerFactory.getLogger(JwtUtil.class);
-    @PostConstruct
-    public void init() {
-        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
-        if (keyBytes.length < 32) {
-            throw new IllegalArgumentException("JWT secret key must be at least 32 bytes");
+    public String extractToken(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            return token.substring(7); // Remove "Bearer " prefix
         }
-        this.key = Keys.hmacShaKeyFor(keyBytes);
-    }
-    public String generateToken(String username) {
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
-                .setIssuer("planpro-app")
-                .setId(UUID.randomUUID().toString())
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
+        return null;
     }
 
-//    public String extractUsername(String token) {
-//        return Jwts.parserBuilder()
-//                .setSigningKey(key)
-//                .build()
-//                .parseClaimsJws(token)
-//                .getBody()
-//                .getSubject();
-//    }
-//
-//    public boolean validateToken(String token) {
-//        try {
-//            Jwts.parserBuilder()
-//                    .setSigningKey(key)
-//                    .build()
-//                    .parseClaimsJws(token);
-//            return true;
-//        } catch (ExpiredJwtException e) {
-//            log.warn("JWT token expired: {}", e.getMessage());
-//            return false;
-//        } catch (JwtException e) {
-//            log.error("JWT token validation failed: {}", e.getMessage());
-//            return false;
-//        }
-//    }
+    public boolean isTokenExpired(String token) {
+        try {
+            return extractExpiration(token).isBefore(Instant.now());
+        } catch (ExpiredJwtException e) {
+            return true; // Token is expired
+        } catch (JwtException e) {
+            LoggerFactory.getLogger(JwtUtil.class).error("Invalid JWT token: {}", e.getMessage());
+            return true; // Token is invalid
+        }
+    }
+
+    public String doGenerateToken(SecurityUser securityUser) {
+        if (securityUser == null) {
+            throw new IllegalArgumentException("SecurityUser cannot be null");
+        }
+
+        try {
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("userId", Objects.requireNonNull(securityUser.getUserId(), "User ID cannot be null"));
+            claims.put("username", Objects.requireNonNull(securityUser.getUsername(), "Username cannot be null"));
+            claims.put("roles", Objects.requireNonNull(securityUser.getAuthorities(), "Authorities cannot be null"));
+            claims.put("iat", Instant.now().getEpochSecond());
+            claims.put("exp", Instant.now().plusSeconds(getExpireIn()).getEpochSecond());
+            claims.put("jti", UUID.randomUUID().toString());
+
+            JwtClaimsSet claimsSet = JwtClaimsSet.builder()
+                    .subject(securityUser.getUsername())
+                    .claims(c ->c.putAll(claims))
+                    .issuedAt(Instant.now())
+                    .expiresAt(Instant.now().plusSeconds(getExpireIn()))
+                    .build();
+            return jwtEncoder.encode(JwtEncoderParameters.from(claimsSet)).getTokenValue();
+        } catch (Exception e) {
+            throw new JwtException("Error generating JWT token", e);
+        }
+    }
 }
