@@ -27,7 +27,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthServiceImp implements  AuthService {
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+//    private final BCryptPasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final UserAuthenticationProvider userAuthenticationProvider;
     private final PasswordEncryption passwordEncryption;
@@ -35,8 +35,7 @@ public class AuthServiceImp implements  AuthService {
     @Override
     @Transactional
     public void register(AuthRequest request) throws Throwable {
-        if (userRepository.findByUsername(request.getUsername()).isPresent())
-            throw new RuntimeException("Username already exists");
+
         String rawPassword;
         try {
             rawPassword = passwordEncryption.getPassword(request.getPassword());
@@ -46,7 +45,7 @@ public class AuthServiceImp implements  AuthService {
 
         var users = Users.builder()
                 .username(request.getUsername())
-                .password(passwordEncoder.encode(rawPassword))
+                .password(rawPassword)
                 .email(request.getEmail())
                 .role(Role.USER)
                 .status(StatusUser.ACTIVE)

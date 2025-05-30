@@ -8,10 +8,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
-public record SecurityUser(Users users, Optional<String> role) implements UserDetails {
+public record SecurityUser(Users users) implements UserDetails { // Simplified constructor
 
+    public SecurityUser(Users users) {
+        this.users = users;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
