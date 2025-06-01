@@ -36,9 +36,9 @@ public class UserAuthenticationProvider {
         }
 
         try {
-            String processedPassword = passwordEncryption.getPassword(password);
+            // Pass the raw password directly to the authentication manager
             Authentication auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username, processedPassword)
+                new UsernamePasswordAuthenticationToken(username, password)
             );
 
             if (auth == null || !auth.isAuthenticated()) {

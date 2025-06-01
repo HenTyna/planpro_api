@@ -9,11 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-public record SecurityUser(Users users) implements UserDetails { // Simplified constructor
-
-    public SecurityUser(Users users) {
-        this.users = users;
-    }
+public record SecurityUser(Users users) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

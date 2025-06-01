@@ -1,6 +1,5 @@
 package com.planprostructure.planpro;
 
-import com.planprostructure.planpro.properties.JwtProperties;
 import com.planprostructure.planpro.utils.PasswordUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

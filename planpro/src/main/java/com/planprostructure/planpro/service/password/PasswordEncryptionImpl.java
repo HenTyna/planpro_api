@@ -12,7 +12,7 @@ public class PasswordEncryptionImpl implements PasswordEncryption {
 
     @Override
     public String getPassword(String password) throws Exception {
-        // Only decrypt, don't encode - let Spring Security handle the encoding
-        return PasswordUtils.decrypt(password);
+        // Hash the password using BCrypt
+        return passwordEncoder.encode(password);
     }
 }
