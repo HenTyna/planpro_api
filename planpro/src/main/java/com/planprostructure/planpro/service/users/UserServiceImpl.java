@@ -31,10 +31,15 @@ public class UserServiceImpl implements UserService {
         return UserProfileResponse.builder()
                 .id(user.getId())
                 .username(user.getUsername())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .dob(user.getDateOfBirth())
                 .email(user.getEmail())
                 .status(user.getStatus().name())
                 .role(user.getRole().name())
                 .phoneNumber(user.getPhoneNumber())
+                .gender(user.getGender())
+                .profileImageUrl(user.getProfileImageUrl())
                 .build();
     }
 }

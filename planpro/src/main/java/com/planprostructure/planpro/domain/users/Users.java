@@ -26,6 +26,15 @@ public class Users {
     @Column(name = "usr_nm")
     private String username;
 
+    @Column(name = "usr_dob")
+    private String dateOfBirth;
+
+    @Column(name = "usr_fn")
+    private String firstName;
+
+    @Column(name = "usr_ln")
+    private String lastName;
+
     @Column(name = "pwd")
     private String password;
 
@@ -50,15 +59,27 @@ public class Users {
     @Column(name = "reset_token_expiry")
     private LocalDateTime resetTokenExpiry;
 
+    @Column(name = "gender")
+    private String gender;
+
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
+
     @Builder
-    public Users(String username, String password, String email, Role role, String phoneNumber, StatusUser status, LocalDateTime resetTokenExpiry) {
+    public Users(String username, String firstName, String lastName, String dateOfBirth, String password, String email, Role role, String phoneNumber, StatusUser status, LocalDateTime resetTokenExpiry, String resetToken, String gender, String profileImageUrl) {
         this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.dateOfBirth = dateOfBirth;
         this.password = password;
         this.email = email;
         this.role = role;
         this.phoneNumber = phoneNumber;
         this.status = status;
         this.resetTokenExpiry = resetTokenExpiry;
+        this.resetToken = resetToken;
+        this.gender = gender;
+        this.profileImageUrl = profileImageUrl;
     }
 
 

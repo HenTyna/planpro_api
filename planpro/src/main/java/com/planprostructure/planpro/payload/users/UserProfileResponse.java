@@ -12,19 +12,29 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserProfileResponse {
     private Long id;
+    private String firstName;
+    private String lastName;
     private String username;
     private String email;
     private String phoneNumber;
     private String role; // e.g., "USER", "ADMIN", etc.
     private String status; // e.g., "ACTIVE", "INACTIVE", etc.
+    private String gender;
+    private String profileImageUrl;
+    private String dob; // Date of Birth
 
     @Builder
-    public UserProfileResponse(Long id, String username, String email, String phoneNumber, String role, String status) {
+    public UserProfileResponse(Long id, String firstName, String lastName, String username, String email, String phoneNumber, String role, String status, String gender, String profileImageUrl, String dob) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.role = role;
         this.status = status;
+        this.gender = gender;
+        this.profileImageUrl = profileImageUrl;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.dob = dob;
     }
 }

@@ -35,7 +35,7 @@ public class AuthServiceImp implements  AuthService {
     @Override
     @Transactional
     public void register(AuthRequest request) throws Throwable {
-
+        System.err.println("Registering user: " + request.getUsername() + " with email: " + request.getPassword());
         String rawPassword;
         try {
             rawPassword = passwordEncryption.getPassword(request.getPassword());

@@ -12,7 +12,7 @@ public class PasswordEncryptionImpl implements PasswordEncryption {
 
     @Override
     public String getPassword(String password) throws Exception {
-        // Hash the password using BCrypt
-        return passwordEncoder.encode(password);
+        var rawPassword = PasswordUtils.decrypt(password);
+        return passwordEncoder.encode(rawPassword);
     }
 }
