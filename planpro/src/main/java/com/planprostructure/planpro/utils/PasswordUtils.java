@@ -16,37 +16,38 @@ import java.util.UUID;
 public class PasswordUtils {
     private static final String CIPHER_INSTANCE_NAME = "AES/CBC/PKCS5Padding";
     private static final String SECRET_KEY_ALGORITHM = "AES";
-    private static String encryptionKey;
+    public static String ENCRYPTION_KEY;
 
     @Value("${password.encryption.key}")
-    public void setEncryptionKey(String key) {
-        encryptionKey = key;
+    public void setEncryptionKey(String encryptionKey) {
+        ENCRYPTION_KEY = encryptionKey;
     }
 
     public static String generateKey() {
+
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+
             byte[] hash = digest.digest(
                     UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8)
             );
+
             return new String(Hex.encode(hash));
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to generate encryption key", e);
+
+        }catch (Exception e){
+            e.printStackTrace();
         }
+
+        return null;
     }
 
-    private static Cipher prepareAndInitCipher(int encryptionMode) throws Exception {
-        if (encryptionKey == null || encryptionKey.isEmpty()) {
-            throw new IllegalStateException("Encryption key not set");
-        }
 
-        byte[] secretKey = getKey(encryptionKey);
+    private static Cipher prepareAndInitCipher(int encryptionMode) throws Exception {
+        byte[] secretKey = getKey(ENCRYPTION_KEY);
         SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey, SECRET_KEY_ALGORITHM);
 
-        // Use first 16 bytes of hashed key as IV
-        byte[] iv = new byte[16];
-        System.arraycopy(secretKey, 0, iv, 0, 16);
-        IvParameterSpec algorithmParameters = new IvParameterSpec(iv);
+        String iv = new String(Hex.encode(secretKey)).substring(0, 16);
+        IvParameterSpec algorithmParameters = new IvParameterSpec(iv.getBytes());
 
         Cipher cipher = Cipher.getInstance(CIPHER_INSTANCE_NAME);
         cipher.init(encryptionMode, secretKeySpec, algorithmParameters);
@@ -54,38 +55,45 @@ public class PasswordUtils {
         return cipher;
     }
 
-    private static byte[] getKey(String originalKey) throws Exception {
+    private static byte[] getKey(String originalKey) throws Exception
+    {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        return digest.digest(originalKey.getBytes(StandardCharsets.UTF_8));
+        return digest.digest(originalKey.getBytes());
     }
 
-    public static String encrypt(String plainText) {
-        if (plainText == null || plainText.isEmpty()) {
-            throw new IllegalArgumentException("Plain text cannot be null or empty");
-        }
-
+    public static String encrypt(String plainText){
         try {
-            byte[] dataBytes = plainText.getBytes(StandardCharsets.UTF_8);
+
+            byte[] dataBytes = plainText.getBytes();
+            int plaintextLength = dataBytes.length;
+            byte[] plaintext = new byte[plaintextLength];
+            System.arraycopy(dataBytes, 0, plaintext, 0, dataBytes.length);
+
             Cipher cipher = prepareAndInitCipher(Cipher.ENCRYPT_MODE);
-            byte[] encrypted = cipher.doFinal(dataBytes);
-            return Base64.getEncoder().encodeToString(encrypted);
+
+            byte[] encrypted = cipher.doFinal(plaintext);
+            return new String(Base64.getEncoder().encode(encrypted));
+
         } catch (Exception e) {
-            throw new RuntimeException("Encryption failed", e);
+            e.printStackTrace();
+            return null;
         }
     }
 
-    public static String decrypt(String encryptedText) {
-        if (encryptedText == null || encryptedText.isEmpty()) {
-            throw new IllegalArgumentException("Encrypted text cannot be null or empty");
-        }
+    public static String decrypt(String encryptedText) throws Exception {
+        byte[] encrypted = Base64.getDecoder().decode(encryptedText);
 
-        try {
-            byte[] encrypted = Base64.getDecoder().decode(encryptedText);
-            Cipher cipher = prepareAndInitCipher(Cipher.DECRYPT_MODE);
-            byte[] original = cipher.doFinal(encrypted);
-            return new String(original, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            throw new RuntimeException("Decryption failed", e);
-        }
+        Cipher cipher = prepareAndInitCipher(Cipher.DECRYPT_MODE);
+
+        byte[] original = cipher.doFinal(encrypted);
+        return new String(original);
+    }
+
+    public static String byteArrayToHex(byte[] a)
+    {
+        StringBuilder sb = new StringBuilder(a.length * 2);
+        for(byte b: a)
+            sb.append(String.format("%02x", b));
+        return sb.toString();
     }
 }

@@ -4,8 +4,8 @@ spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-    url: jdbc:postgresql://localhost:5433/planpro_db
-    username: postgres
+    url: jdbc:postgresql://localhost:5432/wecomerce
+    username: mac_pg
     password: 12345678
     driver-class-name: org.postgresql.Driver
   jpa:
@@ -19,7 +19,7 @@ spring:
 password:
   encryption:
     key: mytestkeyasdddds
-web-url: http://localhost:3001
+web-url: http://localhost:3000
 
 # JWT Configuration for RSA Keys
 jwt:

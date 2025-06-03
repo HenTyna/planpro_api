@@ -17,43 +17,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserAuthenticationProvider {
     private final AuthenticationManager authenticationManager;
-    private final PasswordEncryption passwordEncryption;
 
-    public UserAuthenticationProvider(
-            @Qualifier("userAuthProvider") AuthenticationManager authenticationManager,
-            PasswordEncryption passwordEncryption
-    ) {
+    public UserAuthenticationProvider(@Qualifier("userAuthProvider")AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
-        this.passwordEncryption = passwordEncryption;
     }
 
+    //Not having access to the user’s password
     public Authentication authenticate(String username, String password) throws Exception {
-        if (username == null || username.trim().isEmpty()) {
-            throw new BusinessException(StatusCode.BAD_REQUEST, "Username cannot be empty");
-        }
-        if (password == null || password.trim().isEmpty()) {
-            throw new BusinessException(StatusCode.BAD_REQUEST, "Password cannot be empty");
-        }
-
         try {
-            // Pass the raw password directly to the authentication manager
-            Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password)
-            );
-
-            if (auth == null || !auth.isAuthenticated()) {
-                throw new BadCredentialsException("Authentication failed");
-            }
-
-            return auth;
-        } catch (UsernameNotFoundException ex) {
-            throw new BusinessException(StatusCode.USER_NOT_FOUND, "User not found: " + username);
+            var rawPwd = PasswordUtils.decrypt(password);
+            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, rawPwd));
+        }catch (UsernameNotFoundException ex){
+            throw new BusinessException(StatusCode.USER_NOT_FOUND, ex.getMessage());
         } catch (BadCredentialsException e) {
-            throw new BusinessException(StatusCode.BAD_CREDENTIALS, "Invalid username or password");
-        } catch (DisabledException e) {
-            throw new BusinessException(StatusCode.USER_DISABLED, "User account is disabled");
-        } catch (Exception e) {
-            throw new BusinessException(StatusCode.AUTHENTICATION_FAILED, "Authentication error occurred");
+//            throw new BadCredentialsException("Incorrect username or password", e);
+            throw new BusinessException(StatusCode.BAD_CREDENTIALS, e);
+        } catch (DisabledException e){
+            throw new BusinessException(StatusCode.USER_DISABLED, e);
         }
     }
 }

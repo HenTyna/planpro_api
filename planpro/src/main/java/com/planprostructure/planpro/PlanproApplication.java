@@ -12,6 +12,7 @@ import org.springframework.retry.annotation.EnableRetry;
 public class PlanproApplication {
     public static void main(String[] args) {
         SpringApplication.run(PlanproApplication.class, args);
-        System.err.println("encrypted password: " + PasswordUtils.encrypt("1234568"));
+        System.err.println("encrypted password: " + PasswordUtils.encrypt("Rose@0001"));
+       
     }
 }

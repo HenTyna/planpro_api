@@ -3,6 +3,7 @@ package com.planprostructure.planpro.service.users;
 import com.planprostructure.planpro.domain.users.UserRepository;
 import com.planprostructure.planpro.domain.users.Users;
 import com.planprostructure.planpro.helper.AuthHelper;
+import com.planprostructure.planpro.payload.users.UpdateProfileRequest;
 import com.planprostructure.planpro.payload.users.UserProfileResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -41,5 +42,24 @@ public class UserServiceImpl implements UserService {
                 .gender(user.getGender())
                 .profileImageUrl(user.getProfileImageUrl())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void updateProfile(UpdateProfileRequest payload) {
+        Long userId = AuthHelper.getUserId();
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
+
+        // Update user fields
+        user.setUsername(payload.getUsername() != null ? payload.getUsername() : user.getUsername());
+        user.setEmail(payload.getEmail() != null ? payload.getEmail() : user.getEmail());
+        user.setFirstName(payload.getFirstName() != null ? payload.getFirstName() : user.getFirstName());
+        user.setLastName(payload.getLastName() != null ? payload.getLastName() : user.getLastName());
+        user.setPhoneNumber(payload.getPhoneNumber() != null ? payload.getPhoneNumber() : user.getPhoneNumber());
+        user.setDateOfBirth(payload.getDob() != null ? payload.getDob() : user.getDateOfBirth());
+        user.setProfileImageUrl(payload.getImageUrl());
+
+        userRepository.save(user);
     }
 }
