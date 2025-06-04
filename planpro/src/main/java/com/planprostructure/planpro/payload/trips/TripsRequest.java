@@ -31,7 +31,7 @@ public class TripsRequest {
     private BigDecimal budget;
     @NotNull
     private String category;
-    @NotNull
+//    @NotNull
     private String imageUrl;
     private String remarks;
     @NotNull
@@ -39,13 +39,13 @@ public class TripsRequest {
     @NotNull
     private String transportation;
     @NotNull
-    private String members; // Comma-separated list of member names
+    private String travelers; // Comma-separated list of member names
     private List<DestinationRequest> destinations;
 
     @Builder
     public TripsRequest(String title, String description, String startDate, String endDate, String location,
                         String status, String currency, BigDecimal budget, String category, String imageUrl,
-                        String remarks, String accommodation, String transportation, String members,
+                        String remarks, String accommodation, String transportation, String travelers,
                         List<DestinationRequest> destinations) {
         this.title = title;
         this.description = description;
@@ -60,7 +60,7 @@ public class TripsRequest {
         this.remarks = remarks;
         this.accommodation = accommodation;
         this.transportation = transportation;
-        this.members = members;
+        this.travelers = travelers;
         this.destinations = destinations;
     }
 }

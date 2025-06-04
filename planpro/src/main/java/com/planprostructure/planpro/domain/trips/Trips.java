@@ -1,7 +1,10 @@
 package com.planprostructure.planpro.domain.trips;
 
+
+import com.planprostructure.planpro.components.JsonbConverter;
 import com.planprostructure.planpro.domain.UpdatableEntity;
 import com.planprostructure.planpro.enums.*;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,9 +12,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.JdbcTypeCode;
-
+import org.hibernate.annotations.Type;
 import java.math.BigDecimal;
 import java.sql.Types;
+import java.util.List;
 
 @Getter
 @Setter
@@ -59,7 +63,7 @@ public class Trips extends UpdatableEntity {
     private CurrencyEnum currency; // Currency for the budget, e.g., USD, EUR
 
     @Column(name = "mem")
-    private String members; // Comma-separated list of member names
+    private String travelers; // Comma-separated list of member names
 
     @Column(name = "accommo")
     private String accommodation; // Accommodation details
@@ -83,7 +87,7 @@ public class Trips extends UpdatableEntity {
     private Status tripStatus;
 
     @Builder
-    public Trips(Long id, Long userId, String title, String description, String startDate, String endDate, CategoryEnums category, TripsStatus status, BigDecimal budget, CurrencyEnum currency, String members, String accommodation, String transportation, String remarks, String imageUrl, String location, Status tripStatus) {
+    public Trips(Long id, Long userId, String title, String description, String startDate, String endDate, CategoryEnums category, TripsStatus status, BigDecimal budget, CurrencyEnum currency, String travelers, String accommodation, String transportation, String remarks, String imageUrl, String location, Status tripStatus) {
         this.id = id;
         this.userId = userId;
         this.title = title;
@@ -94,7 +98,7 @@ public class Trips extends UpdatableEntity {
         this.status = status;
         this.budget = budget;
         this.currency = currency;
-        this.members = members;
+        this.travelers = travelers;
         this.accommodation = accommodation;
         this.transportation = transportation;
         this.remarks = remarks;

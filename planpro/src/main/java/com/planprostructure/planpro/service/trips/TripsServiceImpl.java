@@ -9,6 +9,7 @@ import com.planprostructure.planpro.enums.CurrencyEnum;
 import com.planprostructure.planpro.enums.TripsStatus;
 import com.planprostructure.planpro.helper.AuthHelper;
 import com.planprostructure.planpro.payload.trips.*;
+import io.jsonwebtoken.lang.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +50,7 @@ public class TripsServiceImpl implements TripsService{
                             .status(trip.getStatus().getValue())
                             .budget(trip.getBudget())
                             .currency(trip.getCurrency().getValue())
-                            .members(trip.getMembers())
+                            .travelers(trip.getTravelers())
                             .accommodation(trip.getAccommodation())
                             .transportation(trip.getTransportation())
                             .remarks(trip.getRemarks())
@@ -89,11 +90,12 @@ public class TripsServiceImpl implements TripsService{
                 .status(TripsStatus.fromValue(request.getStatus()))
                 .budget(request.getBudget())
                 .currency(CurrencyEnum.fromValue(request.getCurrency()))
-                .members(request.getMembers())
+                .travelers(request.getTravelers())
                 .accommodation(request.getAccommodation())
                 .transportation(request.getTransportation())
                 .remarks(request.getRemarks())
                 .imageUrl(request.getImageUrl())
+                .location(request.getLocation())
                 .build();
         var savedTrips = tripsRepository.save(trips);
         Long tripId = savedTrips.getId();

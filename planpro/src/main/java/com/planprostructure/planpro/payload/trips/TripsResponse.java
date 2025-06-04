@@ -30,7 +30,7 @@ public class TripsResponse {
 
     private String currency;
 
-    private String members;
+    private String travelers;
 
     private String accommodation;
 
@@ -47,7 +47,7 @@ public class TripsResponse {
     @Builder
     public TripsResponse(Long id, String title, String description, String startDate, String endDate,
                          String category, String status, BigDecimal budget, String currency,
-                         String members, String accommodation, String transportation,
+                         String travelers, String accommodation, String transportation,
                          String remarks,  String imageUrl, String location,
                          List<DestinationResponse> destinations) {
         this.id = id;
@@ -59,7 +59,7 @@ public class TripsResponse {
         this.status = status;
         this.budget = budget;
         this.currency = currency;
-        this.members = members;
+        this.travelers = travelers;
         this.accommodation = accommodation;
         this.transportation = transportation;
         this.remarks = remarks;

@@ -6,12 +6,12 @@ import com.planprostructure.planpro.components.GenericEnum;
 
 public enum CategoryEnums implements GenericEnum<CategoryEnums, String> {
 
-    business("B001"),
-    weekend("W002"),
-    vacation("V003"),
-    family("F004"),
-    adventure("A005"),
-    roadTrip("R006"),
+    business("1"),
+    vacation("2"),
+    weekend("3"),
+    family("4"),
+    adventure("5"),
+    roadTrip("6"),
     ;
 
     private final String value;

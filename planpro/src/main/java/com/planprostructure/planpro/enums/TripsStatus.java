@@ -6,13 +6,13 @@ import com.planprostructure.planpro.components.GenericEnum;
 
 public enum TripsStatus implements GenericEnum<TripsStatus, String> {
 
-    IN_PROGRESS("IN01"),
-    HOLD("IN02"),
-    COMPLETED("IN03"),
-    CANCELLED("IN04"),
-    INCOMING("IN05"),
-    PLANNING("IN06"),
-    BOOKED("IN07"),
+    PLANNING("1"),
+    BOOKED("2"),
+    INCOMING("3"),
+    IN_PROGRESS("4"),
+    COMPLETED("5"),
+    CANCELLED("6"),
+    HOLD("7"),
     ;
 
     private final String value;

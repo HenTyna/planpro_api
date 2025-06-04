@@ -19,7 +19,7 @@ spring:
 password:
   encryption:
     key: mytestkeyasdddds
-web-url: http://localhost:3000
+web-url: http://localhost:3001
 
 # JWT Configuration for RSA Keys
 jwt:

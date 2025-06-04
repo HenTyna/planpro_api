@@ -6,8 +6,8 @@ import com.planprostructure.planpro.components.GenericEnum;
 
 public enum CurrencyEnum implements GenericEnum<CurrencyEnum, String> {
 
-    USD("1"),
-    RIEL("2"),
+    USD("USD"),
+    RIEL("RIEL"),
     ;
     private final String value;
 
