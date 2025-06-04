@@ -1,7 +1,6 @@
 package com.planprostructure.planpro.logging;
 
-import com.planprostructure.planpro.utils.PasswordUtils;
-import io.micrometer.common.util.StringUtils;
+import com.planprostructure.planpro.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,13 +15,13 @@ public class AppLogManager {
 
 //        System.out.println(rawFQN);
 
-        return rawFQN.substring(0, org.apache.commons.lang3.StringUtils.lastIndexOf(rawFQN, "."));
+        return rawFQN.substring(0, StringUtils.lastIndexOf(rawFQN, "."));
     }
 
     private static String[] parseCaller(String str, Object x) {
         return new String[]{
                 str
-            ,   MessageFormat.format("{0}:{1} - {2}", org.apache.commons.lang3.StringUtils.substringAfterLast(str, ".") + ".java", Thread.currentThread().getStackTrace()[4].getLineNumber(), String.valueOf(x))
+            ,   MessageFormat.format("{0}:{1} - {2}", StringUtils.substringAfterLast(str, ".") + ".java", Thread.currentThread().getStackTrace()[4].getLineNumber(), String.valueOf(x))
         };
     }
 

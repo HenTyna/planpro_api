@@ -1,6 +1,7 @@
 package com.planprostructure.planpro.domain.users;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -14,6 +15,9 @@ public interface UserRepository extends JpaRepository<Users, Long> {
     Optional<Users> findByResetToken(String token);
     Optional<String> findRoleById(Long id);
 
-    @Query("SELECT u FROM Users u WHERE u.id = ?1")
-    Optional<Users> findByUserByUserId(Long userId);
+    @Modifying
+    @Query("UPDATE Users u SET u.username = ?1, u.email = ?2, u.firstName = ?3, u.lastName = ?4, " +
+            "u.phoneNumber = ?5,  u.dateOfBirth = ?6, u.profileImageUrl = ?7 WHERE u.id = ?8")
+    int updateProfile(String username, String email, String firstName, String lastName,
+                      String phoneNumber, String dob, String imageUrl, Long userId);
 }

@@ -1,5 +1,6 @@
 package com.planprostructure.planpro.domain.users;
 
+import com.planprostructure.planpro.domain.UpdatableEntity;
 import com.planprostructure.planpro.enums.Role;
 import com.planprostructure.planpro.enums.StatusUser;
 import jakarta.persistence.*;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "tb_user")
-public class Users {
+public class Users extends UpdatableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Assuming the ID is auto-generated

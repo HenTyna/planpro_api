@@ -1,0 +1,29 @@
+package com.planprostructure.planpro.controller;
+
+import com.planprostructure.planpro.components.common.api.ProPlanRestController;
+import com.planprostructure.planpro.payload.trips.TripsRequest;
+import com.planprostructure.planpro.service.trips.TripsService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/wb/v1/trips")
+@RequiredArgsConstructor
+public class TripsController extends ProPlanRestController {
+    private final TripsService tripsService;
+
+    @PostMapping
+    public Object createTrip(@Valid @RequestBody TripsRequest request) throws Throwable {
+        tripsService.createTrips(request);
+        return ok();
+    }
+
+    @GetMapping
+    public Object getTrips(
+            @RequestParam(name = "search_value", required = false) String searchValue,
+            @RequestParam(name = "filter_category", required = false) String filterCategory,
+            @RequestParam(name = "filter_status", required = false) String filterStatus) throws Throwable {
+        return ok(tripsService.getTrips(searchValue, filterCategory, filterStatus));
+    }
+}

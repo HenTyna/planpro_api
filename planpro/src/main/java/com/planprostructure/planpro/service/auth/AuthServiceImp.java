@@ -34,7 +34,7 @@ public class AuthServiceImp implements  AuthService {
     @Override
     @Transactional
     public void register(AuthRequest request) throws Throwable {
-        System.err.println("Registering user: " + request.getUsername() + " with Password: " + request.getPassword());
+
         String rawPassword;
         try {
             rawPassword = passwordEncryption.getPassword(request.getPassword());
@@ -56,8 +56,6 @@ public class AuthServiceImp implements  AuthService {
     @Transactional
     public Object login(LoginRequest request) throws Throwable {
 
-        System.err.println("Login user: " + request.getUsername() + " with Password: " + request.getPassword());
-
         if (request.getUsername() == null || request.getPassword() == null) {
             throw new BusinessException(StatusCode.BAD_REQUEST, "Username and password are required");
         }
@@ -66,10 +64,6 @@ public class AuthServiceImp implements  AuthService {
                 request.getUsername(),
                 request.getPassword()
         );
-
-        System.err.println("Authentication user: " + request.getUsername());
-        System.err.println("Authentication pass: " + request.getPassword());
-        System.err.println("Authentication details: " + authentication.getDetails());
 
         SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
         if (securityUser == null) {

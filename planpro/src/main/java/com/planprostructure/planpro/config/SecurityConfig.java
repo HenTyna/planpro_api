@@ -71,7 +71,11 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html"
                         ).permitAll()
-                        .requestMatchers("/api/wb/v1/users/**").authenticated()
+                        .requestMatchers(
+                                "/api/wb/v1/users/**",
+                                "/api/wb/v1/trips/**"
+
+                        ).authenticated()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling

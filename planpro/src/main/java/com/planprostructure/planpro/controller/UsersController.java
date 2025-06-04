@@ -3,11 +3,9 @@ package com.planprostructure.planpro.controller;
 import com.planprostructure.planpro.components.common.api.ProPlanRestController;
 import com.planprostructure.planpro.payload.users.UpdateProfileRequest;
 import com.planprostructure.planpro.service.users.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/wb/v1/users")
@@ -20,8 +18,8 @@ public class UsersController extends ProPlanRestController {
         return ok(usersService.getProfile());
     }
 
-    @PutMapping
-    public Object updateProfile(UpdateProfileRequest paylod) throws Throwable {
+    @PatchMapping
+    public Object updateProfile(@Valid @RequestBody  UpdateProfileRequest paylod) throws Throwable {
         usersService.updateProfile(paylod);
         return ok();
     }

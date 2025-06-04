@@ -48,18 +48,35 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void updateProfile(UpdateProfileRequest payload) {
         Long userId = AuthHelper.getUserId();
+
+        // Find the user first to verify it exists
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
-
-        // Update user fields
-        user.setUsername(payload.getUsername() != null ? payload.getUsername() : user.getUsername());
-        user.setEmail(payload.getEmail() != null ? payload.getEmail() : user.getEmail());
-        user.setFirstName(payload.getFirstName() != null ? payload.getFirstName() : user.getFirstName());
-        user.setLastName(payload.getLastName() != null ? payload.getLastName() : user.getLastName());
-        user.setPhoneNumber(payload.getPhoneNumber() != null ? payload.getPhoneNumber() : user.getPhoneNumber());
-        user.setDateOfBirth(payload.getDob() != null ? payload.getDob() : user.getDateOfBirth());
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with ID: " + userId);
+        }
+        // Execute the update query
+//        userRepository.updateProfile(
+//                payload.getUsername(),
+//                payload.getEmail(),
+//                payload.getFirstName(),
+//                payload.getLastName(),
+//                payload.getPhoneNumber(),
+//                payload.getDob(),
+//                payload.getImageUrl(),
+//                userId
+//        );
+        user.setUsername(payload.getUsername());
+        user.setEmail(payload.getEmail());
+        user.setFirstName(payload.getFirstName());
+        user.setLastName(payload.getLastName());
+        user.setPhoneNumber(payload.getPhoneNumber());
+        user.setDateOfBirth(payload.getDob());
         user.setProfileImageUrl(payload.getImageUrl());
 
         userRepository.save(user);
+
+
+
     }
 }

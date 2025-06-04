@@ -1,42 +1,12 @@
-server:
-  port: 9090
-
 spring:
   profiles:
     active: local
+    include: quartz
   main:
-    allow-bean-definition-overriding: true
-  datasource:
-    url: jdbc:postgresql://localhost:5432/wecomerce
-    username: mac_pg
-    password: 12345678
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-password:
-  encryption:
-    key: mytestkeyasdddds
-web-url: http://localhost:3000
-
-# JWT Configuration for RSA Keys
+    allow-circular-references: true
 jwt:
-  expiration: 86400000 # 24 hours in milliseconds
-  issuer: planpro-app
-  secret: mySecretKey
-  expirationMs: 86400000 # 24 hours in milliseconds
+  expiration: 2h
 
 rsa:
   public-key: classpath:certs/public-key.pem
   private-key: classpath:certs/private-key.pem
-
-logging:
-  level:
-    org:
-      springframework:
-        security: DEBUG
