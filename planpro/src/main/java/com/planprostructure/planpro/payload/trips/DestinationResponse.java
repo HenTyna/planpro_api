@@ -13,9 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 public class DestinationResponse {
 
-    private String destinationName;
+    private Long tripId;
 
-    private Integer days;
+    private Object destination;
 
-    private List<String> activities;
 }

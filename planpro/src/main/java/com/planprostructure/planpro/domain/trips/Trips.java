@@ -38,10 +38,10 @@ public class Trips extends UpdatableEntity {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "start_date")
+    @Column(name = "start_date", length = 14)
     private String startDate;
 
-    @Column(name = "end_date")
+    @Column(name = "end_date", length = 14)
     private String endDate;
 
     @Column(name = "cate")

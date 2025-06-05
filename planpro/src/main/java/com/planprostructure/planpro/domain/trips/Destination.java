@@ -21,6 +21,9 @@ public class Destination {
     @Column(name = "destination_id")
     private Long id;
 
+    @Column(name = "id")
+    private String destDate;
+
     @Column(name = "trip_id", nullable = false)
     private Long tripId;
 
@@ -44,8 +47,9 @@ public class Destination {
     private List<String> activities = new ArrayList<>();
 
     @Builder
-    public Destination(Long tripId, String destinationName, Integer days, List<String> activities) {
+    public Destination(Long tripId,String destDate, String destinationName, Integer days, List<String> activities) {
         this.tripId = tripId;
+        this.destDate = destDate;
         this.destinationName = destinationName;
         this.days = days;
         if (activities != null) {

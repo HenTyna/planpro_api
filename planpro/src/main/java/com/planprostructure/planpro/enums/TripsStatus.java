@@ -33,7 +33,7 @@ public enum TripsStatus implements GenericEnum<TripsStatus, String> {
             case HOLD -> "On Hold";
             case COMPLETED -> "Completed";
             case CANCELLED -> "Cancelled";
-            case INCOMING -> "Incoming";
+            case INCOMING -> "Upcoming";
             case PLANNING -> "Planning";
             case BOOKED -> "Booked";
         };
