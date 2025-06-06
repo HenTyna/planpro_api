@@ -125,4 +125,53 @@ public class TripsServiceImpl implements TripsService{
         }
         destinationRepository.saveAll(destinationEntities);
     }
+
+    @Override
+    public void updateTrips(Long tripId, TripsRequest request) throws Throwable {
+        var trips = tripsRepository.findById(tripId)
+                .orElseThrow(() -> new RuntimeException("Trip not found"));
+        List<Destination> destinationEntities = new ArrayList<>();
+        if (request.getDestinations() != null) {
+            for (DestinationRequest destRequest : request.getDestinations()) {
+                Destination destination = Destination.builder()
+                        .destDate(destRequest.getId())
+                        .destinationName(destRequest.getDestinationName())
+                        .days(destRequest.getDays())
+                        .activities(destRequest.getActivities())
+                        .build();
+                destinationEntities.add(destination);
+            }
+        }
+
+        trips.setTitle(request.getTitle());
+        trips.setDescription(request.getDescription());
+        trips.setStartDate(request.getStartDate());
+        trips.setEndDate(request.getEndDate());
+        trips.setCategory(CategoryEnums.fromValue(request.getCategory()));
+        trips.setStatus(TripsStatus.fromValue(request.getStatus()));
+        trips.setBudget(request.getBudget());
+        trips.setCurrency(CurrencyEnum.fromValue(request.getCurrency()));
+        trips.setTravelers(request.getTravelers());
+        trips.setAccommodation(request.getAccommodation());
+        trips.setTransportation(request.getTransportation());
+        trips.setRemarks(request.getRemarks());
+        trips.setImageUrl(request.getImageUrl());
+        trips.setLocation(request.getLocation());
+        trips.setTripStatus(Status.NORMAL);
+
+        var tripsSaved =   tripsRepository.save(trips);
+        Long tripIdSaved = tripsSaved.getId();
+        for (Destination d : destinationEntities) {
+            d.setTripId(tripIdSaved);
+        }
+        destinationRepository.saveAll(destinationEntities);
+    }
+
+    @Override
+    public void deleteTrips(Long tripId) throws Throwable {
+        var trips = tripsRepository.findById(tripId)
+                .orElseThrow(() -> new RuntimeException("Trip not found"));
+        trips.setTripStatus(Status.DISABLE);
+        tripsRepository.save(trips);
+    }
 }

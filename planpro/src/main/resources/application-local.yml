@@ -4,10 +4,10 @@ spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/wecomerce
-    username: mac_pg
-#    url: jdbc:postgresql://localhost:5433/planpro_db
-#    username: postgres
+#    url: jdbc:postgresql://localhost:5432/wecomerce
+#    username: mac_pg
+    url: jdbc:postgresql://localhost:5433/planpro_db
+    username: postgres
     password: 12345678
     driver-class-name: org.postgresql.Driver
   jpa:

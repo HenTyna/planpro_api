@@ -26,4 +26,18 @@ public class TripsController extends ProPlanRestController {
             @RequestParam(name = "filter_status", required = false) String filterStatus) throws Throwable {
         return ok(tripsService.getTrips(searchValue, filterCategory, filterStatus));
     }
+
+    @PutMapping("/{tripId}")
+    public Object updateTrip(
+            @PathVariable Long tripId,
+            @Valid @RequestBody TripsRequest request) throws Throwable {
+        tripsService.updateTrips(tripId, request);
+        return ok();
+    }
+
+    @DeleteMapping("/{tripId}")
+    public Object deleteTrip(@PathVariable Long tripId) throws Throwable {
+        tripsService.deleteTrips(tripId);
+        return ok();
+    }
 }
