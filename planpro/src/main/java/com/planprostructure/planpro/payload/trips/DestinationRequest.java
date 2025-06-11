@@ -18,10 +18,10 @@ public class DestinationRequest {
     private String destinationName;
     @NotNull
     private Integer days;
-    private List<String> activities;
+    private String activities; // separated by commas
 
     @Builder
-    public DestinationRequest(String id, String destinationName, Integer days, List<String> activities) {
+    public DestinationRequest(String id, String destinationName, Integer days, String activities) {
         this.id = id;
         this.destinationName = destinationName;
         this.days = days;

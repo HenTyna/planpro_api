@@ -39,3 +39,10 @@ logging:
     org:
       springframework:
         security: DEBUG
+
+file:
+  server-path: D:/upload-files/
+  client-path: /api/v1/image
+  temp-path: ${file.server-path}/temp_qr
+  base-url: http://localhost:9090${file.client-path}
+  base-image-url: http://localhost:9090

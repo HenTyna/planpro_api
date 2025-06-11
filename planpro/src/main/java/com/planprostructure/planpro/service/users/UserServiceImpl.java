@@ -5,6 +5,8 @@ import com.planprostructure.planpro.domain.users.Users;
 import com.planprostructure.planpro.helper.AuthHelper;
 import com.planprostructure.planpro.payload.users.UpdateProfileRequest;
 import com.planprostructure.planpro.payload.users.UserProfileResponse;
+import com.planprostructure.planpro.properties.FileInfoConfig;
+import com.planprostructure.planpro.utils.ImageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final FileInfoConfig fileInfoConfig;
 
     @Override
     @Transactional(readOnly = true)
@@ -72,7 +75,7 @@ public class UserServiceImpl implements UserService {
         user.setLastName(payload.getLastName());
         user.setPhoneNumber(payload.getPhoneNumber());
         user.setDateOfBirth(payload.getDob());
-        user.setProfileImageUrl(payload.getImageUrl());
+        user.setProfileImageUrl(ImageUtil.getImageUrl(fileInfoConfig.getBaseUrl(), payload.getImageUrl()));
 
         userRepository.save(user);
 

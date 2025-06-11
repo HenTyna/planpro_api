@@ -40,4 +40,10 @@ public class TripsController extends ProPlanRestController {
         tripsService.deleteTrips(tripId);
         return ok();
     }
+
+    @DeleteMapping("/destination/{destinationId}")
+    public Object removeDestination(@PathVariable Long destinationId) throws Throwable {
+        tripsService.removeDestination(destinationId);
+        return ok();
+    }
 }

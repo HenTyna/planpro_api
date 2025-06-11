@@ -12,6 +12,8 @@ import com.planprostructure.planpro.enums.Status;
 import com.planprostructure.planpro.enums.TripsStatus;
 import com.planprostructure.planpro.helper.AuthHelper;
 import com.planprostructure.planpro.payload.trips.*;
+import com.planprostructure.planpro.properties.FileInfoConfig;
+import com.planprostructure.planpro.utils.ImageUtil;
 import io.jsonwebtoken.lang.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ import java.util.Map;
 public class TripsServiceImpl implements TripsService{
     private final TripsRepository tripsRepository;
     private final DestinationRepository destinationRepository;
+    private final FileInfoConfig fileInfoConfig;
 
     @Override
     @Transactional(readOnly = true)
@@ -95,6 +98,7 @@ public class TripsServiceImpl implements TripsService{
                         .destinationName(destRequest.getDestinationName())
                         .days(destRequest.getDays())
                         .activities(destRequest.getActivities())
+                        .status(Status.NORMAL)
                         .build();
                 destinationEntities.add(destination);
             }
@@ -114,7 +118,7 @@ public class TripsServiceImpl implements TripsService{
                 .accommodation(request.getAccommodation())
                 .transportation(request.getTransportation())
                 .remarks(request.getRemarks())
-                .imageUrl(request.getImageUrl())
+                .imageUrl(ImageUtil.getImageUrl(fileInfoConfig.getBaseUrl(), request.getImageUrl()))
                 .location(request.getLocation())
                 .tripStatus(Status.NORMAL)
                 .build();
@@ -127,18 +131,23 @@ public class TripsServiceImpl implements TripsService{
     }
 
     @Override
+    @Transactional
     public void updateTrips(Long tripId, TripsRequest request) throws Throwable {
         var trips = tripsRepository.findById(tripId)
                 .orElseThrow(() -> new RuntimeException("Trip not found"));
         List<Destination> destinationEntities = new ArrayList<>();
         if (request.getDestinations() != null) {
             for (DestinationRequest destRequest : request.getDestinations()) {
-                Destination destination = Destination.builder()
-                        .destDate(destRequest.getId())
-                        .destinationName(destRequest.getDestinationName())
-                        .days(destRequest.getDays())
-                        .activities(destRequest.getActivities())
-                        .build();
+                Destination destination = destinationRepository.findById(Long.valueOf(destRequest.getId()))
+                        .orElse(Destination.builder()
+                                .destDate(destRequest.getId())
+                                .destinationName(destRequest.getDestinationName())
+                                .days(destRequest.getDays())
+                                .activities(destRequest.getActivities())
+                                .build());
+                destination.setDestinationName(destRequest.getDestinationName());
+                destination.setDays(destRequest.getDays());
+                destination.setActivities(destRequest.getActivities());
                 destinationEntities.add(destination);
             }
         }
@@ -155,17 +164,18 @@ public class TripsServiceImpl implements TripsService{
         trips.setAccommodation(request.getAccommodation());
         trips.setTransportation(request.getTransportation());
         trips.setRemarks(request.getRemarks());
-        trips.setImageUrl(request.getImageUrl());
+        trips.setImageUrl(ImageUtil.getImageUrl(fileInfoConfig.getBaseUrl(), request.getImageUrl()));
         trips.setLocation(request.getLocation());
         trips.setTripStatus(Status.NORMAL);
 
-        var tripsSaved =   tripsRepository.save(trips);
+        var tripsSaved = tripsRepository.save(trips);
         Long tripIdSaved = tripsSaved.getId();
         for (Destination d : destinationEntities) {
             d.setTripId(tripIdSaved);
         }
         destinationRepository.saveAll(destinationEntities);
     }
+
 
     @Override
     public void deleteTrips(Long tripId) throws Throwable {
@@ -174,4 +184,12 @@ public class TripsServiceImpl implements TripsService{
         trips.setTripStatus(Status.DISABLE);
         tripsRepository.save(trips);
     }
+
+    @Override
+    @Transactional
+    public void removeDestination(Long destinationId) throws Throwable {
+        destinationRepository.updateStatusToCancelled(destinationId);
+    }
+
+
 }

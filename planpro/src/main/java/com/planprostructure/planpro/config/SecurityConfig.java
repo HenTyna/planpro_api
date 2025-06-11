@@ -73,7 +73,8 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(
                                 "/api/wb/v1/users/**",
-                                "/api/wb/v1/trips/**"
+                                "/api/wb/v1/trips/**",
+                                "/api/wb/v1/files/upload-image"
 
                         ).authenticated()
                         .anyRequest().authenticated()

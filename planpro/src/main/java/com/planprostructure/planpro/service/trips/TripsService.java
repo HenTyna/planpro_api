@@ -10,4 +10,6 @@ public interface TripsService {
     void updateTrips(Long tripId, TripsRequest request) throws Throwable;
 
     void deleteTrips(Long tripId) throws Throwable;
+
+    void removeDestination(Long destinationId) throws Throwable;
 }
