@@ -74,7 +74,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/wb/v1/users/**",
                                 "/api/wb/v1/trips/**",
-                                "/api/wb/v1/files/upload-image"
+                                "/api/wb/v1/files/upload-image",
+                                "/api/wb/v1/calendar/**",
+                                "/api/wb/v1/my-notes/**"
 
                         ).authenticated()
                         .anyRequest().authenticated()

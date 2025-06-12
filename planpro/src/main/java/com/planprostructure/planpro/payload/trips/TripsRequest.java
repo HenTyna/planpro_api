@@ -42,11 +42,13 @@ public class TripsRequest {
     private String travelers; // Comma-separated list of member names
     private List<DestinationRequest> destinations;
 
+    private Boolean isCalendarEvent = false; // Flag to indicate if this trip is a calendar event
+
     @Builder
     public TripsRequest(String title, String description, String startDate, String endDate, String location,
                         String status, String currency, BigDecimal budget, String category, String imageUrl,
                         String remarks, String accommodation, String transportation, String travelers,
-                        List<DestinationRequest> destinations) {
+                        List<DestinationRequest> destinations, Boolean isCalendarEvent) {
         this.title = title;
         this.description = description;
         this.startDate = startDate;
@@ -62,5 +64,6 @@ public class TripsRequest {
         this.transportation = transportation;
         this.travelers = travelers;
         this.destinations = destinations;
+        this.isCalendarEvent = isCalendarEvent;
     }
 }

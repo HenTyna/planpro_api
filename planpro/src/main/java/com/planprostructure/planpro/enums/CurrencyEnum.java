@@ -8,6 +8,7 @@ public enum CurrencyEnum implements GenericEnum<CurrencyEnum, String> {
 
     USD("USD"),
     RIEL("RIEL"),
+    UNKNOWN("UNKNOWN")
     ;
     private final String value;
 
@@ -28,7 +29,7 @@ public enum CurrencyEnum implements GenericEnum<CurrencyEnum, String> {
             case RIEL:
                 return "RIEL";
             default:
-                return "RIEL";
+                return "UNKNOWN";
         }
     }
     @JsonCreator

@@ -18,6 +18,7 @@ public class DateTimeUtils {
     private static final String VA_PATTERN_DATE8 = "yyyyMMdd";
     private static final String VA_PATTERN_DTM14 = "yyyyMMddHHmmss";
     private static final String VA_PATTERN_DTM_MINUTE = "yyyyMMddHHmm";
+    private static final String TIME_FORMAT = "HH:mm";
 
     private static final String DATE_FORMAT = "yyyyMMddHHmmss";
 
@@ -74,6 +75,20 @@ public class DateTimeUtils {
         // Format due date to string
         return dueDate.format(VA_FORMATTER_DTM14);
     }
+    //00:02 to 0000
+    public static String formatTimeToHHmmss(String time) {
+        if (time == null || time.isEmpty()) {
+            return "000000"; // Default to midnight if input is null or empty
+        }
+        try {
+            DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("HH:mm");
+            DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("HHmmss");
+            LocalTime localTime = LocalTime.parse(time, inputFormatter);
+            return localTime.format(outputFormatter);
+        } catch (DateTimeParseException e) {
+            return "000000"; // Return default if parsing fails
+        }
+    }
 
     public static String getDueDateTime(Long term) {
         return ictNow().plusDays(term).format(VA_FORMATTER_DTM14);
@@ -99,9 +114,16 @@ public class DateTimeUtils {
         return day == DayOfWeek.SUNDAY || day == DayOfWeek.SATURDAY;
     }
 
+    //get time yyyyMMddHHmmss to hh:mm
+    public static String getTime(String dateTime) {
+        return dateTime.substring(8, 14);
+    }
+
     public static void main(String[] args) {
         System.err.println(parseDateTime("20230227125500").isAfter(LocalDateTime.now()));
         System.err.println(DateTimeUtils.ictNow().format(VA_FORMATTER_YYYYMM).equals(parseDateTime("20220627125500").format(VA_FORMATTER_YYYYMM)));
+        //ex: getTime("20230227125500") will return 12:55
+        System.err.println(getTime("20230227125500"));
     }
 
     public static String stringToDate (String value) {

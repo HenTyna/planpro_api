@@ -2,17 +2,17 @@ package com.planprostructure.planpro.service.trips;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.planprostructure.planpro.domain.calendar.Calendar;
+import com.planprostructure.planpro.domain.calendar.CalendarRepository;
 import com.planprostructure.planpro.domain.trips.Destination;
 import com.planprostructure.planpro.domain.trips.DestinationRepository;
 import com.planprostructure.planpro.domain.trips.Trips;
 import com.planprostructure.planpro.domain.trips.TripsRepository;
-import com.planprostructure.planpro.enums.CategoryEnums;
-import com.planprostructure.planpro.enums.CurrencyEnum;
-import com.planprostructure.planpro.enums.Status;
-import com.planprostructure.planpro.enums.TripsStatus;
+import com.planprostructure.planpro.enums.*;
 import com.planprostructure.planpro.helper.AuthHelper;
 import com.planprostructure.planpro.payload.trips.*;
 import com.planprostructure.planpro.properties.FileInfoConfig;
+import com.planprostructure.planpro.utils.DateTimeUtils;
 import com.planprostructure.planpro.utils.ImageUtil;
 import io.jsonwebtoken.lang.Arrays;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +29,7 @@ public class TripsServiceImpl implements TripsService{
     private final TripsRepository tripsRepository;
     private final DestinationRepository destinationRepository;
     private final FileInfoConfig fileInfoConfig;
+    private final CalendarRepository calendarRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -110,10 +111,10 @@ public class TripsServiceImpl implements TripsService{
                 .description(request.getDescription())
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
-                .category(CategoryEnums.fromValue(request.getCategory()))
-                .status(TripsStatus.fromValue(request.getStatus()))
+                .category(CategoryEnums.fromValue(request.getCategory()) == null ? CategoryEnums.other : CategoryEnums.fromValue(request.getCategory()))
+                .status(TripsStatus.fromValue(request.getStatus()) == null ? TripsStatus.UNKNOWN : TripsStatus.fromValue(request.getStatus()))
                 .budget(request.getBudget())
-                .currency(CurrencyEnum.fromValue(request.getCurrency()))
+                .currency(CurrencyEnum.fromValue(request.getCurrency()) == null ? CurrencyEnum.UNKNOWN : CurrencyEnum.fromValue(request.getCurrency()))
                 .travelers(request.getTravelers())
                 .accommodation(request.getAccommodation())
                 .transportation(request.getTransportation())
@@ -128,6 +129,26 @@ public class TripsServiceImpl implements TripsService{
             d.setTripId(tripId);
         }
         destinationRepository.saveAll(destinationEntities);
+
+        if (request.getIsCalendarEvent() != null && request.getIsCalendarEvent()) {
+            // Create a calendar event for the trip
+            var calendar = Calendar.builder()
+                    .title(request.getTitle())
+                    .startDate(request.getStartDate())
+                    .endDate(request.getEndDate())
+                    .startTime(DateTimeUtils.getTime(request.getStartDate()))
+                    .endTime(DateTimeUtils.getTime(request.getEndDate()))
+                    .description(request.getDescription())
+                    .location(request.getLocation())
+                    .tripId(tripId)
+                    .userId(AuthHelper.getUserId())
+                    .calendarType(CalendarEnum.travel)
+                    .status(Status.NORMAL)
+                    .attendees(request.getTravelers())
+                    .build();
+            calendarRepository.save(calendar);
+        }
+
     }
 
     @Override

@@ -12,6 +12,7 @@ public enum CategoryEnums implements GenericEnum<CategoryEnums, String> {
     family("4"),
     adventure("5"),
     roadTrip("6"),
+    other("0")
     ;
 
     private final String value;
@@ -41,7 +42,7 @@ public enum CategoryEnums implements GenericEnum<CategoryEnums, String> {
             case roadTrip:
                 return "Road Trip";
             default:
-                return "Road Trip";
+                return "Other";
         }
     }
     @JsonCreator

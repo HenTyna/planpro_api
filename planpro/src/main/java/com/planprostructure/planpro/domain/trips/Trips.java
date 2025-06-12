@@ -1,10 +1,8 @@
 package com.planprostructure.planpro.domain.trips;
 
 
-import com.planprostructure.planpro.components.JsonbConverter;
 import com.planprostructure.planpro.domain.UpdatableEntity;
 import com.planprostructure.planpro.enums.*;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,10 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
 import java.math.BigDecimal;
 import java.sql.Types;
-import java.util.List;
 
 @Getter
 @Setter
@@ -86,8 +82,16 @@ public class Trips extends UpdatableEntity {
     @ColumnDefault("1")
     private Status tripStatus;
 
+    @Column(name = "is_cal_event")
+    @JdbcTypeCode(Types.BOOLEAN)
+    @ColumnDefault("false")
+    private Boolean isCalendarEvent = false; // Flag to indicate if the trip is linked to a calendar event
+
+    @Column(name = "is_notify")
+    private boolean isNotify = false;
+
     @Builder
-    public Trips(Long id, Long userId, String title, String description, String startDate, String endDate, CategoryEnums category, TripsStatus status, BigDecimal budget, CurrencyEnum currency, String travelers, String accommodation, String transportation, String remarks, String imageUrl, String location, Status tripStatus) {
+    public Trips(Long id, Long userId, String title, String description, String startDate, String endDate, CategoryEnums category, TripsStatus status, BigDecimal budget, CurrencyEnum currency, String travelers, String accommodation, String transportation, String remarks, String imageUrl, String location, Status tripStatus, Boolean isCalendarEvent, boolean isNotify) {
         this.id = id;
         this.userId = userId;
         this.title = title;
@@ -105,6 +109,8 @@ public class Trips extends UpdatableEntity {
         this.imageUrl = imageUrl;
         this.location = location;
         this.tripStatus = tripStatus;
+        this.isCalendarEvent = isCalendarEvent;
+        this.isNotify = isNotify;
     }
 
 

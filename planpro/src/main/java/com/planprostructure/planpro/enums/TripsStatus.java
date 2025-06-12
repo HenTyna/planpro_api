@@ -13,6 +13,7 @@ public enum TripsStatus implements GenericEnum<TripsStatus, String> {
     COMPLETED("5"),
     CANCELLED("6"),
     HOLD("7"),
+    UNKNOWN("0")
     ;
 
     private final String value;
@@ -36,6 +37,7 @@ public enum TripsStatus implements GenericEnum<TripsStatus, String> {
             case INCOMING -> "Upcoming";
             case PLANNING -> "Planning";
             case BOOKED -> "Booked";
+            default -> "Unknown";
         };
     }
     @JsonCreator
