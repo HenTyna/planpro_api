@@ -1,9 +1,14 @@
 package com.planprostructure.planpro.service.myNote;
 
+import com.planprostructure.planpro.domain.calendar.Calendar;
+import com.planprostructure.planpro.domain.calendar.CalendarRepository;
 import com.planprostructure.planpro.domain.myNote.MyNotes;
 import com.planprostructure.planpro.domain.myNote.MyNotesRepository;
+import com.planprostructure.planpro.enums.CalendarEnum;
+import com.planprostructure.planpro.enums.Status;
 import com.planprostructure.planpro.helper.AuthHelper;
 import com.planprostructure.planpro.payload.myNotes.MyNoteRequest;
+import com.planprostructure.planpro.utils.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +19,8 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class MyNoteServiceImpl implements MyNoteService{
     private final MyNotesRepository myNotesRepository;
+    private final CalendarRepository calendarRepository;
+
 
     @Override
     @Transactional
@@ -38,6 +45,23 @@ public class MyNoteServiceImpl implements MyNoteService{
                 .isDeleted(false)
                 .build();
         myNotesRepository.save(myNotes);
+        var isCalendarEvent = myNoteRequest.isCalendarEvent();
+        if (isCalendarEvent) {
+            var calendar = Calendar.builder()
+                   .userId(AuthHelper.getUserId())
+                   .noteId(myNotes.getId())
+                   .title(myNoteRequest.getTitle())
+                   .description(myNoteRequest.getContent())
+                    .startDate(DateTimeUtils.stringToDateYYYY_MM_DD(myNoteRequest.getCreatedAt()))
+                    .endDate(DateTimeUtils.stringToDateYYYY_MM_DD(myNoteRequest.getUpdatedAt()))
+                    .startTime(DateTimeUtils.getTime(myNoteRequest.getCreatedAt()))
+                    .endTime(DateTimeUtils.getTime(myNoteRequest.getUpdatedAt()))
+                    .status(Status.NORMAL)
+                    .calendarType(CalendarEnum.personal)
+                    .attendees(AuthHelper.getUsername())
+                   .build();
+            calendarRepository.save(calendar);
+        }
 
     }
 
@@ -55,10 +79,44 @@ public class MyNoteServiceImpl implements MyNoteService{
         myNote.setUpdatedAt(myNoteRequest.getUpdatedAt());
         myNote.setColor(myNoteRequest.getColor());
         myNote.setTextColor(myNoteRequest.getTextColor());
-        myNote.setNotify(myNoteRequest.isCalendarEvent());
-        myNote.setCalendarEvent(myNoteRequest.isNotify());
+        myNote.setNotify(myNoteRequest.isNotify());
+        myNote.setCalendarEvent(myNoteRequest.isCalendarEvent());
         myNote.setDeleted(false);
         myNotesRepository.save(myNote);
+
+        var isCalendarEvent = myNoteRequest.isCalendarEvent();
+        if (isCalendarEvent) {
+            var calendar = calendarRepository.findByNoteId(noteId);
+            if (calendar == null) {
+                // Create a calendar event for the note
+                var newCalendar = Calendar.builder()
+                        .userId(AuthHelper.getUserId())
+                        .noteId(myNote.getId())
+                        .title(myNoteRequest.getTitle())
+                        .description(myNoteRequest.getContent())
+                        .startDate(DateTimeUtils.stringToDateYYYY_MM_DD(myNoteRequest.getCreatedAt()))
+                        .endDate(DateTimeUtils.stringToDateYYYY_MM_DD(myNoteRequest.getUpdatedAt()))
+                        .startTime(DateTimeUtils.getTime(myNoteRequest.getCreatedAt()))
+                        .status(Status.NORMAL)
+                        .calendarType(CalendarEnum.personal)
+                        .attendees(AuthHelper.getUsername())
+                        .build();
+                calendarRepository.save(newCalendar);
+            }
+            else {
+                // Update existing calendar event
+                calendar.setTitle(myNoteRequest.getTitle());
+                calendar.setDescription(myNoteRequest.getContent());
+                calendar.setStartDate(DateTimeUtils.stringToDateYYYY_MM_DD(myNoteRequest.getCreatedAt()));
+                calendar.setEndDate(DateTimeUtils.stringToDateYYYY_MM_DD(myNoteRequest.getUpdatedAt()));
+                calendar.setStartTime(DateTimeUtils.getTime(myNoteRequest.getCreatedAt()));
+                calendar.setStatus(Status.NORMAL);
+                calendar.setCalendarType(CalendarEnum.personal);
+                calendar.setAttendees(AuthHelper.getUsername());
+                calendarRepository.save(calendar);
+            }
+        }
+
     }
 
     @Override

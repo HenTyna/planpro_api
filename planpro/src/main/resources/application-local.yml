@@ -46,3 +46,12 @@ file:
   temp-path: ${file.server-path}/temp_qr
   base-url: http://localhost:9090${file.client-path}
   base-image-url: http://localhost:9090
+
+telegram-setting:
+  enable: true
+  base-url: https://api.telegram.org
+  username: planproapp_bot
+#  group-chat-id: otpmonitoring
+  access-token: 7845816657:AAEJxT5tVXW88cDYELYli2ttY5glQsJQq7o
+  bot-url: https://t.me/planproapp_bot
+  share-url: https://t.me/planproapp_bot

@@ -70,6 +70,7 @@ public class Calendar extends UpdatableEntity {
     private String attendees; // Comma-separated list of user IDs
 
     @Column(name = "is_notify")
+    @ColumnDefault("false")
     private boolean isNotify = false;
 
     @Builder

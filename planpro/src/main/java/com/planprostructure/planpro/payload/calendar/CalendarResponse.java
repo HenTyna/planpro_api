@@ -22,9 +22,16 @@ public class CalendarResponse {
     private Status status;
     private CalendarEnum calendarType;
     private String attendees; // Comma-separated list of attendee names or emails
+    private Long noteId;
+
+   private boolean isNote;
+
+    public boolean hasNoteId() {
+        return noteId != null;
+    }
 
     @Builder
-    public CalendarResponse(Long id,String eventTitle, String description, String startDate, String endDate, String startTime, String endTime, String location, Status status, CalendarEnum calendarType, String attendees) {
+    public CalendarResponse(Long id, String eventTitle, String description, String startDate, String endDate, String startTime, String endTime, String location, Status status, CalendarEnum calendarType, String attendees, Long noteId) {
         this.id = id;
         this.eventTitle = eventTitle;
         this.description = description;
@@ -36,6 +43,8 @@ public class CalendarResponse {
         this.status = status;
         this.calendarType = calendarType;
         this.attendees = attendees;
+        this.noteId = noteId;
+        this.isNote = noteId != null;
     }
 
 }

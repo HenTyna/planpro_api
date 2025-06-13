@@ -75,6 +75,7 @@ public class CalendarServiceImpl implements CalendarService {
                 .status(cal.getStatus())
                 .calendarType(cal.getCalendarType())
                 .attendees(cal.getAttendees())
+                .noteId(cal.getNoteId())
                 .build()).toList();
 
     }
@@ -96,6 +97,7 @@ public class CalendarServiceImpl implements CalendarService {
                 .status(calendar.getStatus())
                 .calendarType(calendar.getCalendarType())
                 .attendees(calendar.getAttendees())
+                .noteId(calendar.getNoteId())
                 .build();
     }
 

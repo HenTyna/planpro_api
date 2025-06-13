@@ -8,7 +8,7 @@ public enum CalendarEnum implements GenericEnum<CalendarEnum, String> {
 
     meeting("1"),
     vacation("2"),
-    weekend("3"),
+    workshop("3"),
     personal("4"),
     deadline("5"),
     travel("6")
@@ -30,8 +30,8 @@ public enum CalendarEnum implements GenericEnum<CalendarEnum, String> {
                 return "Meeting";
             case vacation:
                 return "Vacation";
-            case weekend:
-                return "Weekend";
+            case workshop:
+                return "Workshop";
             case personal:
                 return "Personal";
             case deadline:

@@ -16,8 +16,8 @@ public class MyNoteRequest {
     private String updatedAt;
     private String color;
     private String textColor;
-    private boolean isCalendarEvent = false;
-    private boolean isNotify = false;
+    private boolean isCalendarEvent;
+    private boolean isNotify;
 
     @Builder
     public MyNoteRequest(Long id, String title, String content, String createdAt, String updatedAt, String color, String textColor, boolean isCalendarEvent, boolean isNotify) {
