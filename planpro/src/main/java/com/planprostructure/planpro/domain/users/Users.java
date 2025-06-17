@@ -1,6 +1,7 @@
 package com.planprostructure.planpro.domain.users;
 
 import com.planprostructure.planpro.domain.UpdatableEntity;
+import com.planprostructure.planpro.domain.folder.Folder;
 import com.planprostructure.planpro.enums.Role;
 import com.planprostructure.planpro.enums.StatusUser;
 import jakarta.persistence.*;
@@ -12,6 +13,8 @@ import org.hibernate.annotations.JdbcTypeCode;
 
 import java.sql.Types;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,6 +29,9 @@ public class Users extends UpdatableEntity {
 
     @Column(name = "usr_nm")
     private String username;
+
+    @Column(unique = true)
+    private Long telegramId;
 
     @Column(name = "usr_dob")
     private String dateOfBirth;
@@ -67,8 +73,9 @@ public class Users extends UpdatableEntity {
     private String profileImageUrl;
 
     @Builder
-    public Users(String username, String firstName, String lastName, String dateOfBirth, String password, String email, Role role, String phoneNumber, StatusUser status, LocalDateTime resetTokenExpiry, String resetToken, String gender, String profileImageUrl) {
+    public Users(String username, Long telegramId, String firstName, String lastName, String dateOfBirth, String password, String email, Role role, String phoneNumber, StatusUser status, LocalDateTime resetTokenExpiry, String resetToken, String gender, String profileImageUrl) {
         this.username = username;
+        this.telegramId = telegramId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;

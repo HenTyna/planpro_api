@@ -1,7 +1,5 @@
 package com.planprostructure.planpro;
 
-import com.planprostructure.planpro.enums.TripsStatus;
-import com.planprostructure.planpro.utils.PasswordUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
@@ -13,8 +11,5 @@ import org.springframework.retry.annotation.EnableRetry;
 public class PlanproApplication {
     public static void main(String[] args) {
         SpringApplication.run(PlanproApplication.class, args);
-        System.err.println("encrypted password: " + PasswordUtils.encrypt("Rose@0001"));
-        System.err.println("test" + TripsStatus.fromValue(String.valueOf(1)).getLabel());
-       
     }
 }

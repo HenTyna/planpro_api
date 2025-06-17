@@ -36,9 +36,12 @@ rsa:
 
 logging:
   level:
-    org:
-      springframework:
-        security: DEBUG
+    root: info
+    #    org.springframework.security: trace
+    org.hibernate: info
+    org.hibernate.SQL: debug
+    org.springframework.jdbc.core: trace
+    org.hibernate.orm.jdbc.bind: trace
 
 file:
   server-path: D:/upload-files/
