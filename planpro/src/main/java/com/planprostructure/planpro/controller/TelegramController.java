@@ -22,4 +22,9 @@ public class TelegramController extends ProPlanRestController {
         return ok(telegramService.verifyTelegramUser(chatId));
     }
 
+    @GetMapping("/get-telegram-user-info")
+    public Object getTelegramUserInfo() throws Throwable {
+        return ok(telegramService.getTelegramUserByChatId());
+    }
+
 }

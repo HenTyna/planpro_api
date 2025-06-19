@@ -80,6 +80,12 @@ public class TelegramServiceImpl implements TelegramService {
                 build();
     }
 
+    @Override
+    public Object getTelegramUserByChatId() throws Throwable {
+        var telegramUserOpt = telegramBotUserRepository.findByUserIdAndChatId(AuthHelper.getUserId());
+        return telegramUserOpt.get();
+    }
+
 
     private String createNewUser(User telegramUser, long chatId) {
         TelegramBotUser newUser = new TelegramBotUser();

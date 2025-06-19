@@ -1,15 +1,17 @@
 server:
   port: 9090
+
 spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-#    url: jdbc:postgresql://localhost:5432/wecomerce
-#    username: mac_pg
     url: jdbc:postgresql://localhost:5433/planpro_db
     username: postgres
     password: 12345678
     driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 10
   jpa:
     hibernate:
       ddl-auto: update
@@ -18,31 +20,51 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
+      javax:
+        persistence:
+          schema-generation:
+            database:
+              action: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+# JSONB Configuration
+json:
+  mapping:
+    pretty-print: true
+
+# Password Encryption
 password:
   encryption:
     key: mytestkeyasdddds
+
+# Application URLs
 web-url: http://localhost:3001
 
-# JWT Configuration for RSA Keys
+# JWT Configuration
 jwt:
   expiration: 86400000 # 24 hours in milliseconds
   issuer: planpro-app
   secret: mySecretKey
   expirationMs: 86400000 # 24 hours in milliseconds
 
+# RSA Keys Configuration
 rsa:
   public-key: classpath:certs/public-key.pem
   private-key: classpath:certs/private-key.pem
 
+# Logging Configuration
 logging:
   level:
     root: info
-    #    org.springframework.security: trace
     org.hibernate: info
     org.hibernate.SQL: debug
     org.springframework.jdbc.core: trace
     org.hibernate.orm.jdbc.bind: trace
 
+# File Storage Configuration
 file:
   server-path: D:/upload-files/
   client-path: /api/v1/image
@@ -50,11 +72,11 @@ file:
   base-url: http://localhost:9090${file.client-path}
   base-image-url: http://localhost:9090
 
+# Telegram Configuration
 telegram-setting:
   enable: true
   base-url: https://api.telegram.org
   username: planproapp_bot
-#  group-chat-id: otpmonitoring
   access-token: 7845816657:AAEJxT5tVXW88cDYELYli2ttY5glQsJQq7o
   bot-url: https://t.me/planproapp_bot
   share-url: https://t.me/planproapp_bot

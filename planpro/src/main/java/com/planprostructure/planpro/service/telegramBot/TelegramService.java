@@ -11,4 +11,6 @@ public interface TelegramService {
     void connectTelegramUserToPlanProUser(Long chatI) throws Throwable;
 
     Object verifyTelegramUser(Long chatId) throws Throwable;
+
+    Object getTelegramUserByChatId() throws Throwable;
 }

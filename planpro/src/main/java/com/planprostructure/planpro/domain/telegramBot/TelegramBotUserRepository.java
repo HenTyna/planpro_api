@@ -8,5 +8,6 @@ import java.util.Optional;
 public interface TelegramBotUserRepository extends JpaRepository<TelegramBotUser, Long> {
     @Query("SELECT t FROM TelegramBotUser t WHERE t.chatId = ?1")
     Optional<TelegramBotUser> findByChatId(Long chatId);
-    Optional<TelegramBotUser> findByUserId(Long userId);
+    @Query("SELECT t FROM TelegramBotUser t WHERE t.userId = ?1")
+    Optional<TelegramBotUser> findByUserIdAndChatId(Long userId);
 }

@@ -77,7 +77,8 @@ public class SecurityConfig {
                                 "/api/wb/v1/files/upload-image",
                                 "/api/wb/v1/calendar/**",
                                 "/api/wb/v1/my-notes/**",
-                                "/api/wb/v1/telegram/**"
+                                "/api/wb/v1/telegram/**",
+                                "/api/wb/v1/chat/**"
 
                         ).authenticated()
                         .anyRequest().authenticated()

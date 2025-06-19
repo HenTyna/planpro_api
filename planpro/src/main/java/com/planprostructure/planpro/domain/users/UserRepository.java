@@ -13,7 +13,8 @@ public interface UserRepository extends JpaRepository<Users, Long> {
     List<Users> findByUsername(String username);
     Optional<Users> findByEmail(String email);
     Optional<Users> findByResetToken(String token);
-    Optional<String> findRoleById(Long id);
+    @Query("SELECT u FROM Users u WHERE u.id = ?1 AND u.username = ?2") //check again
+    Optional<Users> findByUserIdAndUsername(Long id, String username);
 
     @Modifying
     @Query("UPDATE Users u SET u.username = ?1, u.email = ?2, u.firstName = ?3, u.lastName = ?4, " +
