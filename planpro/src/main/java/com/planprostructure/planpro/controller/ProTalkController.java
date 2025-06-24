@@ -19,15 +19,15 @@ public class ProTalkController extends ProPlanRestController {
 
     private final ChatService chatService;
 
-    @PostMapping("/users")
-    public Object createUser(@RequestParam Long phoneNumber, @RequestParam String username){
-        chatService.createUser(phoneNumber, username);
-        return ok();
-    }
+//    @PostMapping("/users")
+//    public Object createUser(@RequestParam Long phoneNumber, @RequestParam String username){
+//        chatService.createUser(phoneNumber, username);
+//        return ok();
+//    }
 
-    @GetMapping("/users/{userId}")
-    public Object getUser(@PathVariable Long userId) {
-        return ok(chatService.getUser(userId));
+    @GetMapping("/users")
+    public Object getAllUsers() {
+        return ok(chatService.getAllUsers());
     }
 
     @PostMapping("/conversations")
@@ -51,13 +51,8 @@ public class ProTalkController extends ProPlanRestController {
     }
 
     @GetMapping("/messages/{conversationId}")
-    public Object getConversationMessages(@PathVariable Long conversationId,
-                                          @RequestParam(defaultValue = "0") int page,
-                                          @RequestParam(defaultValue = "10") int size,
-                                          @RequestParam(defaultValue = "id") String sort) {
-        List<Sort.Order> sortBuilder = new MultiSortBuilder().with(sort).build();
-        Pageable pageRequest = PageRequest.of(page, size, Sort.by(sortBuilder));
-        return ok(chatService.getConversationMessages(conversationId, sort, pageRequest));
+    public Object getConversationMessages(@PathVariable Long conversationId) {
+        return ok(chatService.getConversationMessages(conversationId));
     }
 
     @PatchMapping("/messages/status")

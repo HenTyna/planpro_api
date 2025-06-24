@@ -6,9 +6,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface ChatService {
-    UserResponse createUser(Long phoneNumber, String username);
+//    UserResponse createUser(Long phoneNumber, String username);
 
-    UserResponse getUser(Long userId);
+    List<UserResponse> getAllUsers();
 
     ConversationResponse createConversation(ConversationRequest request);
 
@@ -18,7 +18,7 @@ public interface ChatService {
 
     MessageResponse sendMessage(MessageRequest request);
 
-    List<MessageResponse> getConversationMessages(Long conversationId, String sort, Pageable pageable);
+    List<MessageResponse> getConversationMessages(Long conversationId);
 
     MessageResponse updateMessageStatus(StatusUpdateRequest request);
 

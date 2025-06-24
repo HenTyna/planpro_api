@@ -3,6 +3,7 @@ package com.planprostructure.planpro.service.proTalk;
 import com.planprostructure.planpro.domain.proTalk.*;
 import com.planprostructure.planpro.domain.users.UserRepository;
 import com.planprostructure.planpro.enums.MessageStatus;
+import com.planprostructure.planpro.helper.AuthHelper;
 import com.planprostructure.planpro.payload.proTalk.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -25,21 +26,26 @@ public class ChatServiceImpl implements ChatService{
     private final MessageRepository messageRepository;
     private final UserRepository usersRepository;
 
-    @Override
-    public UserResponse createUser(Long phoneNumber, String username) { //check again
-        var user = usersRepository.findByUserIdAndUsername(phoneNumber, username)
-                .orElseThrow(() -> new RuntimeException("User not found with Phone No.: " + phoneNumber));
-        UserChat userChat = new UserChat();
-        userChat.setUserId(user.getId());
-        userChat.setUsername(user.getUsername());
-        return UserResponse.fromEntity(userRepository.save(userChat));
-    }
+//    @Override
+//    public UserResponse createUser(Long phoneNumber, String username) { //check again
+//        var user = usersRepository.findByUserIdAndUsername(phoneNumber, username)
+//                .orElseThrow(() -> new RuntimeException("User not found with Phone No.: " + phoneNumber));
+//        UserChat userChat = new UserChat();
+//        userChat.setUserId(user.getId());
+//        userChat.setUsername(user.getUsername());
+//        return UserResponse.fromEntity(userRepository.save(userChat));
+//    }
 
     @Override
-    public UserResponse getUser(Long userId) {
-        return userRepository.findById(userId)
+    public List<UserResponse> getAllUsers() {
+        List<UserChat> users = userRepository.findAll();
+        if (users.isEmpty()) {
+            throw new RuntimeException("No users found");
+        }
+        return users.stream()
+                .filter(owner -> !owner.getUserId().equals(AuthHelper.getUserId())) // Exclude current user
                 .map(UserResponse::fromEntity)
-                .orElseThrow(()-> new RuntimeException("User not found with id: " + userId));
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -98,8 +104,8 @@ public class ChatServiceImpl implements ChatService{
     }
 
     @Override
-    public List<MessageResponse> getConversationMessages(Long conversationId, String sort, Pageable pageable) {
-        return messageRepository.findByConversationId(conversationId, pageable)
+    public List<MessageResponse> getConversationMessages(Long conversationId) {
+        return messageRepository.findByConversationId(conversationId)
                 .stream()
                 .map(MessageResponse::fromEntity)
                 .collect(Collectors.toList());

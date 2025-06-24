@@ -29,6 +29,9 @@ public class UserChat {
     @Column(name = "phone_number")
     private Integer phoneNumber;
 
+    @Column(name = "profile_image_url")
+    private String profilePicture;
+
     @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
     private Set<Conversations> conversations = new HashSet<>();
 

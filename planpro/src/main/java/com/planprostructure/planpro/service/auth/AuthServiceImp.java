@@ -3,6 +3,8 @@ package com.planprostructure.planpro.service.auth;
 import com.planprostructure.planpro.components.common.api.StatusCode;
 import com.planprostructure.planpro.config.JwtUtil;
 import com.planprostructure.planpro.config.UserAuthenticationProvider;
+import com.planprostructure.planpro.domain.proTalk.UserChat;
+import com.planprostructure.planpro.domain.proTalk.UserChatRepository;
 import com.planprostructure.planpro.domain.security.SecurityUser;
 import com.planprostructure.planpro.domain.users.UserRepository;
 import com.planprostructure.planpro.domain.users.Users;
@@ -30,6 +32,7 @@ public class AuthServiceImp implements  AuthService {
     private final JwtUtil jwtUtil;
     private final UserAuthenticationProvider userAuthenticationProvider;
     private final PasswordEncryption passwordEncryption;
+    private final UserChatRepository userChatRepository;
 
     @Override
     @Transactional
@@ -49,7 +52,13 @@ public class AuthServiceImp implements  AuthService {
                 .role(Role.USER)
                 .status(StatusUser.ACTIVE)
                 .build();
-        userRepository.save(users);
+        var userSaved = userRepository.save(users);
+
+        var userId = userSaved.getId();
+        UserChat userChat = new UserChat();
+        userChat.setUserId(userId);
+        userChat.setUsername(userSaved.getUsername());
+        userChatRepository.save(userChat);
     }
 
     @Override
