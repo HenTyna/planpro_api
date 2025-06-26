@@ -64,12 +64,24 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/",
                                 "/api/wb/v1/auth/**",
-                                "/api/v1/auth/**", 
+                                "/api/v1/auth/**",
                                 "/api/v1/image/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/swagger-ui.html"
+                                "/v3/api-docs.yaml",
+                                "/swagger-ui.html",
+                                "/swagger-ui/index.html",
+                                "/webjars/**",
+                                "/swagger-resources/**",
+                                "/swagger-ui.html/**",
+                                "/swagger-ui.html**",
+                                "/swagger.json",
+                                "/swagger-ui/**",
+                                "/swagger-ui/index.html",
+                                "/api/**",
+                                "/**"
                         ).permitAll()
                         .requestMatchers(
                                 "/api/wb/v1/users/**",

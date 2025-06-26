@@ -1,7 +1,7 @@
 package com.planprostructure.planpro.service.users;
 
-import com.planprostructure.planpro.domain.proTalk.UserChat;
-import com.planprostructure.planpro.domain.proTalk.UserChatRepository;
+//import com.planprostructure.planpro.domain.proTalk.UserChat;
+//import com.planprostructure.planpro.domain.proTalk.UserChatRepository;
 import com.planprostructure.planpro.domain.users.UserRepository;
 import com.planprostructure.planpro.domain.users.Users;
 import com.planprostructure.planpro.helper.AuthHelper;
@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final FileInfoConfig fileInfoConfig;
-    private final UserChatRepository userChatRepository;
+//    private final UserChatRepository userChatRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -82,12 +82,6 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
-        var userSaved = user;
-        var userChatId = userChatRepository.findByUserId(userSaved.getId());
-        if (userChatId != null) {
-            userChatId.setProfilePicture(ImageUtil.getImageUrl(fileInfoConfig.getBaseUrl(), payload.getImageUrl()));
-            userChatRepository.save(userChatId);
-        }
 
 
 

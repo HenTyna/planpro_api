@@ -1,55 +1,60 @@
 package com.planprostructure.planpro.domain.proTalk;
 
+import com.planprostructure.planpro.domain.users.Users;
+import com.planprostructure.planpro.enums.ChatType;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @Entity
-@Table(name = "tb_conversations")
+@Table(name = "conversations")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Conversations {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "conversation_id")
     private Long id;
 
-    @Column(name = "is_grp")
-    private boolean isGroup;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private ChatType type = ChatType.DIRECT;
 
-    @Column(name = "name")
-    private String name;
+    private String title;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "conversation_members",
-            joinColumns = @JoinColumn(name = "conversation_id"),
-            inverseJoinColumns = @JoinColumn(name = "usr_id")
-    )
-    private Set<UserChat> members = new HashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Users createdBy;
 
-    @OneToMany(
-            mappedBy = "conversation",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY
-    )
-    private List<Messages> messages = new ArrayList<>();
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
-    @Builder
-    public Conversations(Long id, boolean isGroup, String name, Set<UserChat> members, List<Messages> messages) {
-        this.id = id;
-        this.isGroup = isGroup;
-        this.name = name;
-        this.members = members != null ? members : new HashSet<>();
-        this.messages = messages != null ? messages : new ArrayList<>();
-    }
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<ConversationParticipant> participants = new HashSet<>();
+
+    @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<Message> messages = new HashSet<>();
+
+
 }

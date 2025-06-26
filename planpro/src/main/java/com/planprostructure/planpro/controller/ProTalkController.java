@@ -1,67 +1,103 @@
 package com.planprostructure.planpro.controller;
 
 import com.planprostructure.planpro.components.common.api.ProPlanRestController;
-import com.planprostructure.planpro.payload.MultiSortBuilder;
-import com.planprostructure.planpro.payload.proTalk.*;
-import com.planprostructure.planpro.service.proTalk.ChatService;
+import com.planprostructure.planpro.payload.weTalk.ContactRequest;
+import com.planprostructure.planpro.payload.weTalk.SendMessageRequest;
+import com.planprostructure.planpro.service.proTalk.ContactService;
+import com.planprostructure.planpro.service.proTalk.ConversationService;
+import com.planprostructure.planpro.service.proTalk.MessageService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/wb/v1/chat")
 @RequiredArgsConstructor
+@Tag(name = "ProTalk", description = "ProTalk API for managing contacts, conversations, and messages")
 public class ProTalkController extends ProPlanRestController {
 
-    private final ChatService chatService;
+    private final ContactService chatService;
+    private final ConversationService conversationService;
+    private final MessageService messageService;
 
-//    @PostMapping("/users")
-//    public Object createUser(@RequestParam Long phoneNumber, @RequestParam String username){
-//        chatService.createUser(phoneNumber, username);
-//        return ok();
-//    }
 
-    @GetMapping("/users")
-    public Object getAllUsers() {
-        return ok(chatService.getAllUsers());
+    @GetMapping("/contacts")
+    public Object getUserContacts() throws Throwable{
+        return ok(chatService.getUserContacts());
     }
 
-    @PostMapping("/conversations")
-    public Object createConversation(@RequestBody ConversationRequest request) {
-        return ok(chatService.createConversation(request));
+    @GetMapping("/contacts/request")
+    public Object getPendingContactsRequest() throws Throwable{
+        return ok(chatService.getPendingContactsRequest());
     }
 
-    @GetMapping("/conversations/{userId}")
-    public Object getUserConversations(@PathVariable Long userId) {
-        return ok(chatService.getUserConversations(userId));
+    @PatchMapping("/contacts/{contactId}/accept")
+    public Object acceptContactRequest(@PathVariable Long contactId) throws Throwable {
+        return ok(chatService.acceptContactRequest(contactId));
+    }
+
+    @PatchMapping("/contacts/{contactId}/reject")
+    public Object rejectContactRequest(@PathVariable Long contactId) throws Throwable {
+        return ok(chatService.rejectContactRequest(contactId));
+    }
+
+    @PostMapping("/contacts")
+    public Object addContact(@RequestBody ContactRequest request) throws Throwable {
+        chatService.addContact(request);
+        return ok();
+    }
+
+    @GetMapping("/my_contacts")
+    public Object getMyContacts() throws Throwable {
+        return ok(chatService.getMyContact());
+    }
+
+
+    // Conversation Endpoints
+
+    @GetMapping("/conversations")
+    public Object getUserConversations() throws Throwable {
+        return ok(conversationService.getUserConversations());
     }
 
     @GetMapping("/conversations/{conversationId}")
-    public Object getConversation(@PathVariable Long conversationId) {
-        return ok(chatService.getConversation(conversationId));
+    public Object getConversationById(@PathVariable Long conversationId)  throws Throwable  {
+        return ok(conversationService.getConversationById(conversationId));
     }
 
-    @PostMapping("/messages")
-    public Object sendMessage(@RequestBody MessageRequest request) {
-        return ok(chatService.sendMessage(request));
+    @GetMapping("/conversations/unread_count/{conversationId}")
+    public Object getUnreadMessageCount(@PathVariable Long conversationId) throws Throwable {
+        return ok(conversationService.getUnreadMessageCounts(conversationId));
     }
 
+    @PostMapping("/conversations/{userId}")
+    public Object createConversationDirect(@PathVariable Long userId) throws Throwable {
+        conversationService.createDirectConversation(userId);
+        return ok();
+    }
+
+    @PostMapping("/conversations/as_read/{conversationId}")
+    public Object markConversationAsRead(@PathVariable Long conversationId) throws Throwable {
+        conversationService.markConversationAsRead(conversationId);
+        return ok();
+    }
+
+
+    // Message Endpoints
     @GetMapping("/messages/{conversationId}")
-    public Object getConversationMessages(@PathVariable Long conversationId) {
-        return ok(chatService.getConversationMessages(conversationId));
+    public Object getConversationMessages(@PathVariable Long conversationId) throws Throwable {
+        return ok(messageService.getConversationMessages(conversationId));
+    }
+    @PostMapping("/messages/{conversationId}")
+    public Object sendMessage(@PathVariable Long conversationId, @RequestBody SendMessageRequest request) throws Throwable {
+        messageService.sendMessage(conversationId, request);
+        return ok();
     }
 
-    @PatchMapping("/messages/status")
-    public Object updateMessageStatus(@RequestBody StatusUpdateRequest request) {
-        return ok(chatService.updateMessageStatus(request));
+    @DeleteMapping("/messages/{messageId}")
+    public Object deleteMessage(@PathVariable Long messageId) throws Throwable {
+        messageService.deleteMessage(messageId);
+        return ok();
     }
 
-    @PostMapping("/messages/reactions")
-    public Object addReaction(@RequestBody ReactionRequest request) {
-        return ok(chatService.addReaction(request));
-    }
 }

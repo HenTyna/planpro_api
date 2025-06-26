@@ -3,12 +3,14 @@ package com.planprostructure.planpro.controller;
 import com.planprostructure.planpro.components.common.api.ProPlanRestController;
 import com.planprostructure.planpro.payload.myNotes.MyNoteRequest;
 import com.planprostructure.planpro.service.myNote.MyNoteService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/wb/v1/my-notes")
 @RequiredArgsConstructor
+@Tag(name = "My Notes", description = "My Notes API")
 public class MyNoteController extends ProPlanRestController {
 
     private final MyNoteService myNoteService;

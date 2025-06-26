@@ -3,6 +3,7 @@ package com.planprostructure.planpro.controller;
 import com.planprostructure.planpro.components.common.api.ProPlanRestController;
 import com.planprostructure.planpro.payload.trips.TripsRequest;
 import com.planprostructure.planpro.service.trips.TripsService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/wb/v1/trips")
 @RequiredArgsConstructor
+@Tag(name = "Trips", description = "Trips API")
 public class TripsController extends ProPlanRestController {
     private final TripsService tripsService;
 

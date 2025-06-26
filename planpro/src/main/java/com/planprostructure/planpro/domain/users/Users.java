@@ -2,32 +2,40 @@ package com.planprostructure.planpro.domain.users;
 
 import com.planprostructure.planpro.domain.UpdatableEntity;
 import com.planprostructure.planpro.domain.folder.Folder;
+import com.planprostructure.planpro.domain.proTalk.Contact;
+import com.planprostructure.planpro.domain.proTalk.ConversationParticipant;
+import com.planprostructure.planpro.domain.proTalk.Conversations;
+import com.planprostructure.planpro.domain.proTalk.Message;
 import com.planprostructure.planpro.enums.Role;
 import com.planprostructure.planpro.enums.StatusUser;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "tb_user")
+@Table(name = "tb_user", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email"),
+        @UniqueConstraint(columnNames = "phone"),
+        @UniqueConstraint(columnNames = "username")
+})
+@Builder
 public class Users extends UpdatableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Assuming the ID is auto-generated
     private Long id;
 
-    @Column(name = "usr_nm")
+    @Column(name = "username")
     private String username;
 
     @Column(unique = true)
@@ -52,7 +60,7 @@ public class Users extends UpdatableEntity {
     @Enumerated(EnumType.STRING)
     private Role role; // e.g., ADMIN, USER, etc.
 
-    @Column(name = "phone_number")
+    @Column(name = "phone")
     private String phoneNumber;
 
     @Column(name = "sts",nullable = false, length = Types.CHAR)
@@ -72,23 +80,31 @@ public class Users extends UpdatableEntity {
     @Column(name = "profile_image_url")
     private String profileImageUrl;
 
-    @Builder
-    public Users(String username, Long telegramId, String firstName, String lastName, String dateOfBirth, String password, String email, Role role, String phoneNumber, StatusUser status, LocalDateTime resetTokenExpiry, String resetToken, String gender, String profileImageUrl) {
-        this.username = username;
-        this.telegramId = telegramId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.dateOfBirth = dateOfBirth;
-        this.password = password;
-        this.email = email;
-        this.role = role;
-        this.phoneNumber = phoneNumber;
-        this.status = status;
-        this.resetTokenExpiry = resetTokenExpiry;
-        this.resetToken = resetToken;
-        this.gender = gender;
-        this.profileImageUrl = profileImageUrl;
-    }
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<Contact> contacts = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<ConversationParticipant> conversationParticipants = new HashSet<>();
+
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
+    @Builder.Default
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<Message> messages = new HashSet<>();
+
+    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
+    @Builder.Default
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<Conversations> createdConversations = new HashSet<>();
+
+
 
 
 }
