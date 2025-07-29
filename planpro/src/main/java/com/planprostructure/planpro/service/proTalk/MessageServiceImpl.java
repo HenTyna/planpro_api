@@ -10,6 +10,7 @@ import com.planprostructure.planpro.enums.Status;
 import com.planprostructure.planpro.helper.AuthHelper;
 import com.planprostructure.planpro.payload.weTalk.MessageResponse;
 import com.planprostructure.planpro.payload.weTalk.SendMessageRequest;
+import com.planprostructure.planpro.service.websocket.WebSocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ public class MessageServiceImpl implements MessageService {
     private final MessageRepository messageRepository;
     private final ConversationRepository conversationRepository;
     private final UserRepository userRepository;
+    private final WebSocketService webSocketService;
 
     @Override
     public List<MessageResponse> getConversationMessages(Long conversationId) {
@@ -92,6 +94,9 @@ public class MessageServiceImpl implements MessageService {
         conversation.setUpdatedAt(LocalDateTime.now());
         conversationRepository.save(conversation);
 
+        // 7. Broadcast message via WebSocket for real-time delivery
+        webSocketService.broadcastNewMessage(message);
+
         return MessageResponse.fromMessage(message);
     }
 
@@ -116,6 +121,9 @@ public class MessageServiceImpl implements MessageService {
         conversation.setUpdatedAt(LocalDateTime.now());
         conversationRepository.save(conversation);
 
+        // Broadcast message edit via WebSocket
+        webSocketService.broadcastMessageEdit(message);
+
         return MessageResponse.fromMessage(message);
     }
 
@@ -125,9 +133,12 @@ public class MessageServiceImpl implements MessageService {
         Message message = messageRepository.findById(messageId).orElseThrow(
                 () -> new RuntimeException("Message not found")
         );
-        if (!message.getSender().equals(currentUserId)) {
+        if (!message.getSender().getId().equals(currentUserId)) {
             throw new IllegalArgumentException("You can only delete your own messages");
         }
+        
+        Long conversationId = message.getConversation().getId();
+        
         Conversations conversation = message.getConversation();
         if (conversation.getMessages().stream()
                 .max((m1, m2) -> m1.getCreatedAt().compareTo(m2.getCreatedAt()))
@@ -138,5 +149,8 @@ public class MessageServiceImpl implements MessageService {
         }
         message.setMessageStatus(Status.DISABLE);
         messageRepository.save(message);
+
+        // Broadcast message delete via WebSocket
+        webSocketService.broadcastMessageDelete(messageId, conversationId);
     }
 }
