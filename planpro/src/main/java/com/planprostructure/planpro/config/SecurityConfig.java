@@ -91,7 +91,10 @@ public class SecurityConfig {
                                 "/api/wb/v1/calendar/**",
                                 "/api/wb/v1/my-notes/**",
                                 "/api/wb/v1/telegram/**",
-                                "/api/wb/v1/chat/**"
+                                "/api/wb/v1/chat/**",
+                                "/api/v1/chat/**",
+                                "/api/v1/conversations/**",
+                                "/api/v1/message/**"
                        ).authenticated()
                         .anyRequest().authenticated()
                 )

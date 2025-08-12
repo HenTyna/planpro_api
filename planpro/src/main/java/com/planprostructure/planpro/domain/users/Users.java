@@ -1,11 +1,6 @@
 package com.planprostructure.planpro.domain.users;
 
 import com.planprostructure.planpro.domain.UpdatableEntity;
-import com.planprostructure.planpro.domain.folder.Folder;
-import com.planprostructure.planpro.domain.proTalk.Contact;
-import com.planprostructure.planpro.domain.proTalk.ConversationParticipant;
-import com.planprostructure.planpro.domain.proTalk.Conversations;
-import com.planprostructure.planpro.domain.proTalk.Message;
 import com.planprostructure.planpro.enums.Role;
 import com.planprostructure.planpro.enums.StatusUser;
 import jakarta.persistence.*;
@@ -79,31 +74,6 @@ public class Users extends UpdatableEntity {
 
     @Column(name = "profile_image_url")
     private String profileImageUrl;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Set<Contact> contacts = new HashSet<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Set<ConversationParticipant> conversationParticipants = new HashSet<>();
-
-    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
-    @Builder.Default
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Set<Message> messages = new HashSet<>();
-
-    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
-    @Builder.Default
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Set<Conversations> createdConversations = new HashSet<>();
-
 
 
 
