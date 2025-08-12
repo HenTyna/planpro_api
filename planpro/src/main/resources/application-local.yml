@@ -57,6 +57,8 @@ rsa:
 
 # Logging Configuration
 logging:
+  file:
+    name: planpro-app.log
   level:
     root: info
     org.hibernate: info

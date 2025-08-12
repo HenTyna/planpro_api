@@ -65,6 +65,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",
+                                "/auth/**",
                                 "/api/wb/v1/auth/**",
                                 "/api/v1/auth/**",
                                 "/api/v1/image/**",
@@ -80,8 +81,10 @@ public class SecurityConfig {
                                 "/swagger.json",
                                 "/swagger-ui/**",
                                 "/swagger-ui/index.html",
-                                "/api/**",
-                                "/**",
+                                "/api/**"
+
+                        ).permitAll()
+                       .requestMatchers(
                                 "/api/wb/v1/users/**",
                                 "/api/wb/v1/trips/**",
                                 "/api/wb/v1/files/upload-image",
@@ -89,17 +92,7 @@ public class SecurityConfig {
                                 "/api/wb/v1/my-notes/**",
                                 "/api/wb/v1/telegram/**",
                                 "/api/wb/v1/chat/**"
-                        ).permitAll()
-//                        .requestMatchers(
-//                                "/api/wb/v1/users/**",
-//                                "/api/wb/v1/trips/**",
-//                                "/api/wb/v1/files/upload-image",
-//                                "/api/wb/v1/calendar/**",
-//                                "/api/wb/v1/my-notes/**",
-//                                "/api/wb/v1/telegram/**",
-//                                "/api/wb/v1/chat/**"
-//
-//                        ).authenticated()
+                       ).authenticated()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
