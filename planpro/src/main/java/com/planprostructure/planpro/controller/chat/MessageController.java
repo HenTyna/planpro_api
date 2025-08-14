@@ -33,8 +33,14 @@ public class MessageController {
   }
 
   @PostMapping("/messages/{messageId}/delivered")
-  public void delivered(@PathVariable String messageId, Authentication auth) { messages.markDelivered(messageId, auth.getName()); }
+  public Object delivered(@PathVariable String messageId, Authentication auth) { 
+    messages.markDelivered(messageId, auth.getName()); 
+    return "Message delivered";
+  }
 
   @PostMapping("/conversations/{convId}/read")
-  public void readUpTo(@PathVariable String convId, @RequestParam String messageId, Authentication auth) { messages.markReadUpTo(convId, auth.getName(), messageId); }
+  public Object readUpTo(@PathVariable String convId, @RequestParam String messageId, Authentication auth) { 
+    messages.markReadUpTo(convId, auth.getName(), messageId); 
+    return "Message read";
+  }
 } 

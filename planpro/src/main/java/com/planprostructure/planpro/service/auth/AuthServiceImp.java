@@ -12,9 +12,11 @@ import com.planprostructure.planpro.exception.BusinessException;
 import com.planprostructure.planpro.payload.auth.AuthRequest;
 import com.planprostructure.planpro.payload.auth.AuthResponse;
 import com.planprostructure.planpro.payload.auth.LoginRequest;
+import com.planprostructure.planpro.service.contacts.ContactService;
 import com.planprostructure.planpro.service.password.PasswordEncryption;
 import com.planprostructure.planpro.utils.PasswordUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,12 +26,14 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImp implements  AuthService {
     private final UserRepository userRepository;
 //    private final BCryptPasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final UserAuthenticationProvider userAuthenticationProvider;
     private final PasswordEncryption passwordEncryption;
+    private final ContactService contactService;
 
     @Override
     @Transactional
@@ -46,11 +50,22 @@ public class AuthServiceImp implements  AuthService {
                 .username(request.getUsername())
                 .password(rawPassword)
                 .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
                 .role(Role.USER)
                 .status(StatusUser.ACTIVE)
                 .build();
-       userRepository.save(users);
+        Users savedUser = userRepository.save(users);
 
+        // Create contacts for the new user if phone number is provided
+        if (request.getPhoneNumber() != null && !request.getPhoneNumber().trim().isEmpty()) {
+            try {
+                contactService.createContactsForNewUser(savedUser.getId().toString(), request.getPhoneNumber());
+                log.info("Successfully created contacts for new user: {}", savedUser.getId());
+            } catch (Exception e) {
+                log.error("Failed to create contacts for new user: {}", savedUser.getId(), e);
+                // Don't throw exception here as user registration should still succeed
+            }
+        }
     }
 
     @Override

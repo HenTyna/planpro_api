@@ -67,6 +67,7 @@ public class SecurityConfig {
                                 "/",
                                 "/auth/**",
                                 "/api/wb/v1/auth/**",
+                                "/api/wb/v1/password/**",
                                 "/api/v1/auth/**",
                                 "/api/v1/image/**",
                                 "/swagger-ui/**",
@@ -94,7 +95,9 @@ public class SecurityConfig {
                                 "/api/wb/v1/chat/**",
                                 "/api/v1/chat/**",
                                 "/api/v1/conversations/**",
-                                "/api/v1/message/**"
+                                "/api/v1/message/**",
+                                "/api/v1/contacts/**"
+                                
                        ).authenticated()
                         .anyRequest().authenticated()
                 )

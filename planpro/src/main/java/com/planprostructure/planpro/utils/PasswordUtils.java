@@ -9,6 +9,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -95,5 +96,21 @@ public class PasswordUtils {
         for(byte b: a)
             sb.append(String.format("%02x", b));
         return sb.toString();
+    }
+
+    public static void main(String[] args) throws Exception {
+        System.err.println(PasswordUtils.encrypt("012888888"));
+        System.err.println("session_id: "+PasswordUtils.encrypt("5947e0f7-0b25-4ab8-915d-42f4d0743946"));
+        System.err.println("security code: "+PasswordUtils.encrypt("8989"));
+        //System.err.println(PasswordUtils.decrypt("tv1qsfsQK3WTVKY8ZF3Gzg=="));
+
+        //iOS need to convert to Hex
+//        String originalKey = "webilluat2023";
+//        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+//        byte[] key = digest.digest(originalKey.getBytes(StandardCharsets.UTF_8));
+//        byte[] keyBtye = Arrays.copyOfRange(key, 0 , 16);
+//
+//        System.out.println(Hex.encode(keyBtye));
+//        System.out.println(byteArrayToHex(keyBtye));
     }
 }

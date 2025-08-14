@@ -17,7 +17,6 @@ public class ConversationController extends ProPlanRestController{
   @PostMapping
   public Object create(@Valid @RequestBody ConversationDtos.CreateRequest req, Authentication auth) {
     String username = AuthHelper.getUsername();
-    System.err.println("Username: " + username);
     return service.create(username, req.type(), req.members(), req.title());
   }
 

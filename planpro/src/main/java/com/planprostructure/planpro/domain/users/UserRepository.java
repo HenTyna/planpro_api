@@ -16,6 +16,9 @@ public interface UserRepository extends JpaRepository<Users, Long> {
     @Query("SELECT u FROM Users u WHERE u.id = ?1 AND u.username = ?2") //check again
     Optional<Users> findByUserIdAndUsername(Long id, String username);
 
+    @Query("SELECT u FROM Users u WHERE u.phoneNumber = ?1")
+    List<Users> findByPhoneNumber(String phoneNumber);
+
     @Modifying
     @Query("UPDATE Users u SET u.username = ?1, u.email = ?2, u.firstName = ?3, u.lastName = ?4, " +
             "u.phoneNumber = ?5,  u.dateOfBirth = ?6, u.profileImageUrl = ?7 WHERE u.id = ?8")

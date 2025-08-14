@@ -82,23 +82,22 @@ telegram-setting:
   access-token: 7845816657:AAEJxT5tVXW88cDYELYli2ttY5glQsJQq7o
   bot-url: https://t.me/planproapp_bot
   share-url: https://t.me/planproapp_bot
-
+  
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+    url: /v3/api-docs
+    disable-swagger-default-url: true
     operations-sorter: method
     tags-sorter: alpha
-    disable-swagger-default-url: true
-    config-url: /v3/api-docs/swagger-config
-    urls:
-      - url: /v3/api-docs/public
-        name: Public API
-      - url: /v3/api-docs/authentication
-        name: Authentication API
     display-request-duration: true
     filter: true
+    try-it-out-enabled: true
+    doc-expansion: none
+    default-models-expand-depth: 1
   api-docs:
     path: /v3/api-docs
+    enabled: true
   show-actuator: false
   cache:
     disabled: true
