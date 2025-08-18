@@ -19,6 +19,7 @@ test:
   image: gradle:8.5-jdk17
   before_script:
     - chmod +x ./gradlew
+    - ls -la
   script:
     - ./gradlew test --no-daemon
   only:
@@ -35,6 +36,7 @@ build:
   image: gradle:8.5-jdk17
   before_script:
     - chmod +x ./gradlew
+    - ls -la
   script:
     - ./gradlew build --no-daemon
   artifacts:
@@ -44,8 +46,6 @@ build:
   only:
     - main
     - develop
-  dependencies:
-    - test
 
 deploy-to-railway:
   stage: deploy
