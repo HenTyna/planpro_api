@@ -1,0 +1,74 @@
+stages:
+  - test
+  - deploy
+
+variables:
+  RAILWAY_TOKEN: $RAILWAY_TOKEN
+
+# Cache Gradle dependencies
+cache:
+  paths:
+    - .gradle/
+    - build/
+
+test:
+  stage: test
+  image: gradle:8.5-jdk17
+  script:
+    - gradle test
+  only:
+    - main
+    - develop
+  artifacts:
+    reports:
+      junit: build/test-results/test/TEST-*.xml
+    expire_in: 1 week
+
+build:
+  stage: test
+  image: gradle:8.5-jdk17
+  script:
+    - gradle build -x test
+  artifacts:
+    paths:
+      - build/libs/*.jar
+    expire_in: 1 week
+  only:
+    - main
+    - develop
+
+deploy-to-railway:
+  stage: deploy
+  image: node:18-alpine
+  before_script:
+    - npm install -g @railway/cli
+  script:
+    - echo "Logging into Railway..."
+    - railway login --token $RAILWAY_TOKEN
+    - echo "Deploying to Railway..."
+    - railway up --service planpro-api
+  only:
+    - main
+  environment:
+    name: production
+    url: https://planpro-api.up.railway.app
+  when: manual
+  allow_failure: false
+
+deploy-to-staging:
+  stage: deploy
+  image: node:18-alpine
+  before_script:
+    - npm install -g @railway/cli
+  script:
+    - echo "Logging into Railway..."
+    - railway login --token $RAILWAY_TOKEN
+    - echo "Deploying to Railway Staging..."
+    - railway up --service planpro-api-staging
+  only:
+    - develop
+  environment:
+    name: staging
+    url: https://planpro-api-staging.up.railway.app
+  when: manual
+  allow_failure: true 
