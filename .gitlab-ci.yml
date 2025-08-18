@@ -4,34 +4,59 @@ stages:
 
 variables:
   RAILWAY_TOKEN: $RAILWAY_TOKEN
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
 # Cache Gradle dependencies
 cache:
+  key: "$CI_COMMIT_REF_SLUG"
   paths:
-    - .gradle/
-    - build/
+    - planpro/.gradle/
+    - planpro/build/
+    - planpro/gradle/
+    - ~/.gradle/caches/
 
 test:
   stage: test
   image: gradle:8.5-jdk17
+  before_script:
+    - cd planpro  # Change to the Gradle project directory
+    - pwd  # Show current directory
+    - ls -la  # Debug: Verify files in CI
+    - echo "Checking for Gradle files:"
+    - ls -la build.gradle settings.gradle gradlew 2>/dev/null || echo "Some Gradle files missing"
+    - chmod +x ./gradlew  # Ensure wrapper is executable
+    - echo "Gradle wrapper version:"
+    - ./gradlew --version
   script:
-    - gradle test
+    - echo "Running tests with Gradle wrapper..."
+    - ./gradlew test --no-daemon --info  # Use wrapper with more verbose output
   only:
     - main
     - develop
   artifacts:
     reports:
-      junit: build/test-results/test/TEST-*.xml
+      junit: planpro/build/test-results/test/TEST-*.xml
     expire_in: 1 week
+  coverage: '/Total.*?([0-9]{1,3})%/'
 
 build:
   stage: test
   image: gradle:8.5-jdk17
+  before_script:
+    - cd planpro  # Change to the Gradle project directory
+    - pwd  # Show current directory
+    - ls -la  # Debug: Verify files
+    - echo "Checking for Gradle files:"
+    - ls -la build.gradle settings.gradle gradlew 2>/dev/null || echo "Some Gradle files missing"
+    - chmod +x ./gradlew
+    - echo "Gradle wrapper version:"
+    - ./gradlew --version
   script:
-    - gradle build -x test
+    - echo "Building with Gradle wrapper..."
+    - ./gradlew build --no-daemon --info  # Use wrapper with more verbose output
   artifacts:
     paths:
-      - build/libs/*.jar
+      - planpro/build/libs/*.jar
     expire_in: 1 week
   only:
     - main
