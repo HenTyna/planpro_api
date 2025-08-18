@@ -68,9 +68,12 @@ deploy-to-railway:
   script:
     - echo "Setting up Railway authentication..."
     - echo "RAILWAY_TOKEN is set: $([ ! -z "$RAILWAY_TOKEN" ] && echo 'YES' || echo 'NO')"
-    - export RAILWAY_TOKEN="$RAILWAY_TOKEN"
+    - echo "Checking Railway status..."
+    - railway status || echo "Status check failed, continuing..."
+    - echo "Linking to Railway project..."
+    - railway link --project $RAILWAY_PROJECT_ID || echo "Link failed, trying without project ID..."
     - echo "Deploying to Railway..."
-    - railway up --service planpro-api
+    - railway up
   only:
     - main
   environment:
@@ -87,9 +90,12 @@ deploy-to-staging:
   script:
     - echo "Setting up Railway authentication..."
     - echo "RAILWAY_TOKEN is set: $([ ! -z "$RAILWAY_TOKEN" ] && echo 'YES' || echo 'NO')"
-    - export RAILWAY_TOKEN="$RAILWAY_TOKEN"
+    - echo "Checking Railway status..."
+    - railway status || echo "Status check failed, continuing..."
+    - echo "Linking to Railway project..."
+    - railway link --project $RAILWAY_PROJECT_ID || echo "Link failed, trying without project ID..."
     - echo "Deploying to Railway Staging..."
-    - railway up --service planpro-api-staging
+    - railway up
   only:
     - develop
   environment:
