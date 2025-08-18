@@ -11,13 +11,13 @@ import java.util.Optional;
 public interface ContactsRepository extends JpaRepository<Contacts, String> {
     
     @Query("SELECT c FROM Contacts c WHERE c.userId = :userId")
-    List<Contacts> findByUserId(@Param("userId") Long userId);
+    List<Contacts> findByUserId(@Param("userId") String userId);
     
     @Query("SELECT c FROM Contacts c WHERE c.userId = :userId AND c.phone = :phone")
-    Optional<Contacts> findByUserIdAndPhone(@Param("userId") Long userId, @Param("phone") String phone);
+    Optional<Contacts> findByUserIdAndPhone(@Param("userId") String userId, @Param("phone") String phone);
     
     @Query("SELECT c FROM Contacts c WHERE c.userId = :userId AND c.id = :contactId")
-    Optional<Contacts> findByUserIdAndContactId(@Param("userId") Long userId, @Param("contactId") String contactId);
+    Optional<Contacts> findByUserIdAndContactId(@Param("userId") String userId, @Param("contactId") String contactId);
     
     @Query("SELECT c FROM Contacts c WHERE c.phone = :phone")
     List<Contacts> findByPhone(@Param("phone") String phone);

@@ -34,7 +34,7 @@ public class ContactServiceImpl implements ContactService {
         
         // Check if contact already exists for this user
         if (request.getPhone() != null) {
-            Optional<Contacts> existingContact = contactsRepository.findByUserIdAndPhone(currentUserId, request.getPhone());
+            Optional<Contacts> existingContact = contactsRepository.findByUserIdAndPhone(currentUserId.toString(), request.getPhone());
             if (existingContact.isPresent()) {
                 throw new Exception("Contact with this phone number already exists");
             }
@@ -57,7 +57,7 @@ public class ContactServiceImpl implements ContactService {
     @Transactional(readOnly = true)
     public List<ContactResponse> getContacts() throws Exception {
         Long currentUserId = AuthHelper.getUserId();
-        List<Contacts> contacts = contactsRepository.findByUserId(currentUserId);
+        List<Contacts> contacts = contactsRepository.findByUserId(currentUserId.toString());
         return contacts.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -67,7 +67,7 @@ public class ContactServiceImpl implements ContactService {
     @Transactional(readOnly = true)
     public ContactResponse getContact(String contactId) throws Exception {
         Long currentUserId = AuthHelper.getUserId();
-        Optional<Contacts> contact = contactsRepository.findByUserIdAndContactId(currentUserId, contactId);
+        Optional<Contacts> contact = contactsRepository.findByUserIdAndContactId(currentUserId.toString(), contactId);
         
         if (contact.isEmpty()) {
             throw new Exception("Contact not found");
@@ -80,7 +80,7 @@ public class ContactServiceImpl implements ContactService {
     @Transactional
     public void deleteContact(String contactId) throws Exception {
         Long currentUserId = AuthHelper.getUserId();
-        Optional<Contacts> contact = contactsRepository.findByUserIdAndContactId(currentUserId, contactId);
+        Optional<Contacts> contact = contactsRepository.findByUserIdAndContactId(currentUserId.toString(), contactId);
         
         if (contact.isEmpty()) {
             throw new Exception("Contact not found");

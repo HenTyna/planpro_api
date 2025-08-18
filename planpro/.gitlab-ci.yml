@@ -6,22 +6,23 @@ variables:
   RAILWAY_TOKEN: $RAILWAY_TOKEN
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
-# Cache Gradle dependencies
+# Cache Gradle dependencies (improved)
 cache:
   key: "$CI_COMMIT_REF_SLUG"
   paths:
     - .gradle/
     - build/
     - gradle/
+    - ~/.gradle/caches/  # Cache global dependencies
 
 test:
   stage: test
   image: gradle:8.5-jdk17
   before_script:
-    - chmod +x ./gradlew
-    - ls -la
+    - ls -la  # Debug: Verify files in CI
+    - chmod +x ./gradlew  # Ensure wrapper is executable
   script:
-    - ./gradlew test --no-daemon
+    - ./gradlew test --no-daemon  # Use wrapper instead of global gradle
   only:
     - main
     - develop
@@ -35,10 +36,10 @@ build:
   stage: test
   image: gradle:8.5-jdk17
   before_script:
+    - ls -la  # Debug: Verify files
     - chmod +x ./gradlew
-    - ls -la
   script:
-    - ./gradlew build --no-daemon
+    - ./gradlew build --no-daemon  # Use wrapper
   artifacts:
     paths:
       - build/libs/*.jar
@@ -85,4 +86,4 @@ deploy-to-staging:
   when: manual
   allow_failure: true
   dependencies:
-    - build 
+    - build
