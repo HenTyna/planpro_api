@@ -1,25 +1,29 @@
 server:
-  port: 9090
+  port: 9091
 
 spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-    url: jdbc:postgresql://localhost:5433/db_demo
-    username: postgres
-    password: 12345678
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
     hikari:
       connection-timeout: 20000
       maximum-pool-size: 10
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.H2Dialect
         jdbc:
           lob:
             non_contextual_creation: true
@@ -27,8 +31,8 @@ spring:
         persistence:
           schema-generation:
             database:
-              action: update
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+              action: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
 
 # JSONB Configuration
 json:
@@ -71,12 +75,12 @@ file:
   server-path: D:/upload-files/
   client-path: /api/v1/image
   temp-path: ${file.server-path}/temp_qr
-  base-url: http://localhost:9090${file.client-path}
-  base-image-url: http://localhost:9090
+  base-url: http://localhost:9091${file.client-path}
+  base-image-url: http://localhost:9091
 
 # Telegram Configuration
 telegram-setting:
-  enable: true
+  enable: false  # Disable telegram bot for local development
   base-url: https://api.telegram.org
   username: planproapp_bot
   access-token: 7845816657:AAEJxT5tVXW88cDYELYli2ttY5glQsJQq7o
