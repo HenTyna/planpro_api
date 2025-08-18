@@ -4,18 +4,23 @@ stages:
 
 variables:
   RAILWAY_TOKEN: $RAILWAY_TOKEN
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
 # Cache Gradle dependencies
 cache:
+  key: "$CI_COMMIT_REF_SLUG"
   paths:
     - .gradle/
     - build/
+    - gradle/
 
 test:
   stage: test
   image: gradle:8.5-jdk17
+  before_script:
+    - chmod +x ./gradlew
   script:
-    - gradle test
+    - ./gradlew test --no-daemon
   only:
     - main
     - develop
@@ -23,12 +28,15 @@ test:
     reports:
       junit: build/test-results/test/TEST-*.xml
     expire_in: 1 week
+  coverage: '/Total.*?([0-9]{1,3})%/'
 
 build:
   stage: test
   image: gradle:8.5-jdk17
+  before_script:
+    - chmod +x ./gradlew
   script:
-    - gradle build -x test
+    - ./gradlew build --no-daemon
   artifacts:
     paths:
       - build/libs/*.jar
@@ -36,6 +44,8 @@ build:
   only:
     - main
     - develop
+  dependencies:
+    - test
 
 deploy-to-railway:
   stage: deploy
@@ -54,6 +64,8 @@ deploy-to-railway:
     url: https://planpro-api.up.railway.app
   when: manual
   allow_failure: false
+  dependencies:
+    - build
 
 deploy-to-staging:
   stage: deploy
@@ -71,4 +83,6 @@ deploy-to-staging:
     name: staging
     url: https://planpro-api-staging.up.railway.app
   when: manual
-  allow_failure: true 
+  allow_failure: true
+  dependencies:
+    - build 
