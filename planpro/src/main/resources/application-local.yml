@@ -5,9 +5,9 @@ spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-    url: ${{Postgres.DATABASE_URL}}
-    username: ${{Postgres.POSTGRES_USER}}
-    password: ${{Postgres.POSTGRES_PASSWORD}}
+    url: ${Postgres.DATABASE_URL}
+    username: ${Postgres.POSTGRES_USER}
+    password: ${Postgres.POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 20000
