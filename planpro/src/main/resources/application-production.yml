@@ -1,13 +1,13 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/planpro}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
+    url: ${DATABASE_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 20000
@@ -15,10 +15,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
         dialect: org.hibernate.dialect.PostgreSQLDialect
         jdbc:
           lob:
@@ -30,25 +30,24 @@ spring:
               action: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-
 # JSONB Configuration
 json:
   mapping:
-    pretty-print: true
+    pretty-print: false
 
 # Password Encryption
 password:
   encryption:
-    key: mytestkeyasdddds
+    key: ${PASSWORD_ENCRYPTION_KEY:mytestkeyasdddds}
 
 # Application URLs
-web-url: http://localhost:3001
+web-url: ${RAILWAY_STATIC_URL:https://your-app-name.railway.app}
 
 # JWT Configuration
 jwt:
   expiration: 86400000 # 24 hours in milliseconds
   issuer: planpro-app
-  secret: mySecretKey
+  secret: ${JWT_SECRET:mySecretKey}
   expirationMs: 86400000 # 24 hours in milliseconds
 
 # RSA Keys Configuration
@@ -61,28 +60,27 @@ logging:
   file:
     name: planpro-app.log
   level:
-    root: info
-    org.hibernate: info
-    org.hibernate.SQL: debug
-    org.springframework.jdbc.core: trace
-    org.hibernate.orm.jdbc.bind: trace
+    root: warn
+    org.hibernate: warn
+    org.springframework: warn
+    com.planprostructure: info
 
 # File Storage Configuration
 file:
-  server-path: D:/upload-files/
+  server-path: /tmp/upload-files/
   client-path: /api/v1/image
   temp-path: ${file.server-path}/temp_qr
-  base-url: http://localhost:8080${file.client-path}
-  base-image-url: http://localhost:8080
+  base-url: ${RAILWAY_STATIC_URL:https://your-app-name.railway.app}${file.client-path}
+  base-image-url: ${RAILWAY_STATIC_URL:https://your-app-name.railway.app}
 
 # Telegram Configuration
 telegram-setting:
-  enable: false  # Disable telegram bot for local development
+  enable: ${TELEGRAM_BOT_ENABLE:false}
   base-url: https://api.telegram.org
-  username: planproapp_bot
-  access-token: 7845816657:AAEJxT5tVXW88cDYELYli2ttY5glQsJQq7o
-  bot-url: https://t.me/planproapp_bot
-  share-url: https://t.me/planproapp_bot
+  username: ${TELEGRAM_BOT_USERNAME:planproapp_bot}
+  access-token: ${TELEGRAM_BOT_TOKEN:7845816657:AAEJxT5tVXW88cDYELYli2ttY5glQsJQq7o}
+  bot-url: https://t.me/${TELEGRAM_BOT_USERNAME:planproapp_bot}
+  share-url: https://t.me/${TELEGRAM_BOT_USERNAME:planproapp_bot}
   
 springdoc:
   swagger-ui:
@@ -93,7 +91,7 @@ springdoc:
     tags-sorter: alpha
     display-request-duration: true
     filter: true
-    try-it-out-enabled: true
+    try-it-out-enabled: false
     doc-expansion: none
     default-models-expand-depth: 1
   api-docs:
@@ -103,4 +101,4 @@ springdoc:
   cache:
     disabled: true
   default-consumes-media-type: application/json
-  default-produces-media-type: application/json
+  default-produces-media-type: application/json 
