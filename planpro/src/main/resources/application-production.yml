@@ -4,18 +4,7 @@ server:
 spring:
   main:
     allow-bean-definition-overriding: true
-  datasource:
-    # Try Railway's standard variables first, then fallback to Postgres-prefixed
-    url: ${DATABASE_URL:${Postgres.DATABASE_URL}}
-    username: ${DB_USERNAME:${Postgres.POSTGRES_USER}}
-    password: ${DB_PASSWORD:${Postgres.POSTGRES_PASSWORD}}
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      connection-timeout: 30000
-      maximum-pool-size: 10
-      minimum-idle: 2
-      idle-timeout: 300000
-      max-lifetime: 1200000
+  # DataSource is now configured manually in DatabaseConfig.java
   jpa:
     hibernate:
       ddl-auto: update
