@@ -2,8 +2,8 @@
 FROM gradle:8.5-jdk17 AS builder
 WORKDIR /app
 
-# Copy the entire planpro directory
-COPY planpro/ .
+# Copy the entire current directory (planpro contents)
+COPY . .
 
 # Make gradlew executable (important for Railway)
 RUN chmod +x gradlew
