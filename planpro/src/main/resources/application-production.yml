@@ -5,11 +5,10 @@ spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-    # Railway provides DATABASE_URL in format: postgresql://user:pass@host:port/db
-    url: ${DATABASE_URL}
-    # If DATABASE_URL is not provided, use individual components
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:}
+    # Use Railway's PostgreSQL environment variables
+    url: ${Postgres.DATABASE_URL}
+    username: ${Postgres.POSTGRES_USER}
+    password: ${Postgres.POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 30000
