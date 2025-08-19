@@ -2,22 +2,24 @@
 FROM gradle:8.5-jdk17 AS builder
 WORKDIR /app
 
-# Copy gradle files first for better caching
-COPY gradle gradle/
-COPY gradlew build.gradle settings.gradle ./
+# Copy the entire planpro directory
+COPY planpro/ .
+
+# Make gradlew executable (important for Railway)
+RUN chmod +x gradlew
 
 # Download dependencies (this will be cached)
-RUN gradle dependencies --no-daemon
+RUN ./gradlew dependencies --no-daemon
 
-# Copy source code
-COPY src src/
-
-# Build the application
-RUN gradle build --no-daemon
+# Build the application (skip tests for faster build)
+RUN ./gradlew build -x test --no-daemon
 
 # Runtime stage
 FROM openjdk:17-jdk-slim
 WORKDIR /app
+
+# Install curl for health check
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Create uploads directory
 RUN mkdir -p /tmp/uploads
@@ -26,10 +28,11 @@ RUN mkdir -p /tmp/uploads
 COPY --from=builder /app/build/libs/*.jar app.jar
 
 # Expose port (Railway will set PORT environment variable)
-EXPOSE 8080
+EXPOSE $PORT
 
-# Health check
+# Health check using Railway's PORT environment variable
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:${PORT:-8080}/actuator/health || exit 1
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Use Railway's PORT environment variable
+ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT:-8080} -jar app.jar"]
