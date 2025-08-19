@@ -27,9 +27,6 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
-        # Add connection pool debugging
-        connection:
-          provider_disables_autocommit: true
       javax:
         persistence:
           schema-generation:
