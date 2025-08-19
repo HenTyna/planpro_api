@@ -5,13 +5,18 @@ spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
+    # Railway provides DATABASE_URL in format: postgresql://user:pass@host:port/db
     url: ${DATABASE_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    # If DATABASE_URL is not provided, use individual components
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:}
     driver-class-name: org.postgresql.Driver
     hikari:
-      connection-timeout: 20000
+      connection-timeout: 30000
       maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 300000
+      max-lifetime: 1200000
   jpa:
     hibernate:
       ddl-auto: update
@@ -23,6 +28,9 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+        # Add connection pool debugging
+        connection:
+          provider_disables_autocommit: true
       javax:
         persistence:
           schema-generation:
@@ -60,10 +68,12 @@ logging:
   file:
     name: planpro-app.log
   level:
-    root: warn
-    org.hibernate: warn
-    org.springframework: warn
+    root: info
+    org.hibernate: info
+    org.springframework: info
     com.planprostructure: info
+    com.zaxxer.hikari: debug
+    org.springframework.jdbc: debug
 
 # File Storage Configuration
 file:
