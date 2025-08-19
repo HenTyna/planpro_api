@@ -5,7 +5,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-    url: postgresql://postgres:TYvjLBYtKdWrMDwOmdqaCIPUFmtFWkEU@postgres.railway.internal:5432/railway
+    url: jdbc:postgresql://postgres.railway.internal:5432/railway
     username: postgres
     password: TYvjLBYtKdWrMDwOmdqaCIPUFmtFWkEU
     driver-class-name: org.postgresql.Driver
