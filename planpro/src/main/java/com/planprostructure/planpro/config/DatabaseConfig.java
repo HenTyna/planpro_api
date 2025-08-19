@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Map;
 
 @Configuration
 public class DatabaseConfig {
@@ -33,6 +35,24 @@ public class DatabaseConfig {
             logger.info("Database URL: {}", databaseUrl);
             logger.info("Database Username: {}", databaseUsername);
             logger.info("Database Password: {}", databaseUsername.equals("NOT_SET") ? "NOT_SET" : "***HIDDEN***");
+            
+            // Show all relevant environment variables
+            logger.info("=== Environment Variables ===");
+            String[] relevantVars = {
+                "DATABASE_URL", "DB_USERNAME", "DB_PASSWORD",
+                "Postgres.DATABASE_URL", "Postgres.POSTGRES_USER", "Postgres.POSTGRES_PASSWORD",
+                "PGHOST", "PGPORT", "PGUSER", "PGPASSWORD",
+                "SPRING_PROFILES_ACTIVE"
+            };
+            
+            for (String var : relevantVars) {
+                String value = System.getenv(var);
+                if (value != null) {
+                    logger.info("{}: {}", var, var.contains("PASSWORD") ? "***HIDDEN***" : value);
+                } else {
+                    logger.info("{}: NOT_SET", var);
+                }
+            }
             
             // Test the actual connection
             try (Connection connection = dataSource.getConnection()) {
