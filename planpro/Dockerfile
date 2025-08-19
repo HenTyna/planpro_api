@@ -26,10 +26,10 @@ RUN mkdir -p /tmp/uploads
 COPY --from=builder /app/build/libs/*.jar app.jar
 
 # Expose port (Railway will set PORT environment variable)
-EXPOSE 9090
+EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:${PORT:-9090}/actuator/health || exit 1
+  CMD curl -f http://localhost:${PORT:-8080}/actuator/health || exit 1
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
