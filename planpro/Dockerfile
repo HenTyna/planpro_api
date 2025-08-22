@@ -34,5 +34,5 @@ EXPOSE $PORT
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:${PORT:-8080}/actuator/health || exit 1
 
-# Use Railway's PORT environment variable
-ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT:-8080} -jar app.jar"]
+# Use Railway's PORT environment variable with memory optimization
+ENTRYPOINT ["sh", "-c", "java -Xmx512m -Xms256m -XX:+UseG1GC -XX:+UseContainerSupport -Dserver.port=${PORT:-8080} -jar app.jar"]

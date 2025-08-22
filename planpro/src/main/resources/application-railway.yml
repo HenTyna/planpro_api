@@ -3,14 +3,22 @@ server:
 
 spring:
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://${PROD_DB_HOST:localhost}:${PROD_DB_PORT:5432}/${PROD_DB_NAME:mydb}?sslmode=require&sslfactory=org.postgresql.ssl.NonValidatingFactory&tcpKeepAlive=true&socketTimeout=30&connectTimeout=30}
+    # Railway PostgreSQL Configuration with SSL
+    url: ${DATABASE_URL:jdbc:postgresql://${PROD_DB_HOST}:${PROD_DB_PORT}/${PROD_DB_NAME}?sslmode=require&sslfactory=org.postgresql.ssl.NonValidatingFactory&tcpKeepAlive=true&socketTimeout=30&connectTimeout=30}
     username: ${PROD_DB_USERNAME:postgres}
     password: ${PROD_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
-        connection-timeout: 20000
-        maximum-pool-size: 10
-
+      connection-timeout: 30000
+      maximum-pool-size: 3  # Reduced from 10 to 3
+      minimum-idle: 1
+      idle-timeout: 300000
+      max-lifetime: 900000
+      leak-detection-threshold: 60000
+      connection-test-query: SELECT 1
+      validation-timeout: 5000
+      keepalive-time: 30000
+      register-mbeans: false  # Disable MBean registration
   main:
     allow-bean-definition-overriding: true
   sql:
@@ -27,7 +35,7 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
-          batch_size: 20
+          batch_size: 10  # Reduced from 20
           batch_versioned_data: true
         connection:
           provider_disables_autocommit: true
@@ -60,12 +68,14 @@ rsa:
 
 logging:
   level:
-    root: info
-    org.hibernate: info
-    org.springframework: info
+    root: warn  # Changed from info to warn
+    org.hibernate: warn  # Changed from info to warn
+    org.springframework: warn  # Changed from info to warn
     com.planprostructure: info
-    com.zaxxer.hikari: debug
-    org.springframework.jdbc: debug
+    com.zaxxer.hikari: warn  # Changed from debug to warn
+    org.springframework.jdbc: warn  # Changed from debug to warn
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"  # Simplified log format
 
 file:
   server-path: /tmp/upload-files/
