@@ -3,22 +3,11 @@ server:
 
 spring:
   datasource:
-    # Railway PostgreSQL Configuration with SSL
-    url: ${DATABASE_URL:jdbc:postgresql://${PROD_DB_HOST}:${PROD_DB_PORT}/${PROD_DB_NAME}?sslmode=require&sslfactory=org.postgresql.ssl.NonValidatingFactory&tcpKeepAlive=true&socketTimeout=30&connectTimeout=30}
+    url: ${DATABASE_URL:jdbc:postgresql://${PROD_DB_HOST:localhost}:${PROD_DB_PORT:5432}/${PROD_DB_NAME:mydb}?sslmode=require&sslfactory=org.postgresql.ssl.NonValidatingFactory&tcpKeepAlive=true&socketTimeout=30&connectTimeout=30}
     username: ${PROD_DB_USERNAME:postgres}
     password: ${PROD_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
-    hikari:
-      connection-timeout: 30000
-      maximum-pool-size: 5
-      minimum-idle: 1
-      idle-timeout: 300000
-      max-lifetime: 900000
-      leak-detection-threshold: 60000
-      connection-test-query: SELECT 1
-      validation-timeout: 5000
-      keepalive-time: 30000
-      register-mbeans: true
+
   main:
     allow-bean-definition-overriding: true
   sql:
@@ -49,29 +38,23 @@ spring:
               action: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-# JSONB Configuration
 json:
   mapping:
     pretty-print: false
 
-# Password Encryption
 password:
   encryption:
     key: ${PASSWORD_ENCRYPTION_KEY:mytestkeyasdddds}
 
-# JWT Configuration
 jwt:
-  expiration: 86400000 # 24 hours in milliseconds
   issuer: planpro-app
   secret: ${JWT_SECRET:mySecretKey}
-  expirationMs: 86400000 # 24 hours in milliseconds
+  expiration-ms: 86400000 # 24 hours
 
-# RSA Keys Configuration
 rsa:
   public-key: classpath:certs/public-key.pem
   private-key: classpath:certs/private-key.pem
 
-# Logging Configuration
 logging:
   level:
     root: info
@@ -81,7 +64,6 @@ logging:
     com.zaxxer.hikari: debug
     org.springframework.jdbc: debug
 
-# File Storage Configuration
 file:
   server-path: /tmp/upload-files/
   client-path: /api/v1/image
@@ -89,15 +71,14 @@ file:
   base-url: ${RAILWAY_STATIC_URL:https://planpro-api-production.up.railway.app}${file.client-path}
   base-image-url: ${RAILWAY_STATIC_URL:https://planpro-api-production.up.railway.app}
 
-# Telegram Configuration
 telegram-setting:
   enable: ${TELEGRAM_BOT_ENABLE:false}
   base-url: https://api.telegram.org
   username: ${TELEGRAM_BOT_USERNAME:planproapp_bot}
-  access-token: ${TELEGRAM_BOT_TOKEN:7845816657:AAEJxT5tVXW88cDYELYli2ttY5glQsJQq7o}
+  access-token: "${TELEGRAM_BOT_TOKEN:your-token-here}"
   bot-url: https://t.me/${TELEGRAM_BOT_USERNAME:planproapp_bot}
   share-url: https://t.me/${TELEGRAM_BOT_USERNAME:planproapp_bot}
-  
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -117,4 +98,4 @@ springdoc:
   cache:
     disabled: true
   default-consumes-media-type: application/json
-  default-produces-media-type: application/json 
+  default-produces-media-type: application/json
