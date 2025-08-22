@@ -3,27 +3,33 @@ server:
 
 spring:
   datasource:
-    # Railway PostgreSQL Configuration with SSL
-    url: ${DATABASE_URL:jdbc:postgresql://${PROD_DB_HOST}:${PROD_DB_PORT}/${PROD_DB_NAME}?sslmode=require&sslfactory=org.postgresql.ssl.NonValidatingFactory&tcpKeepAlive=true&socketTimeout=30&connectTimeout=30}
+    # Railway PostgreSQL with SSL (uses DATABASE_URL if present; otherwise falls back to individual vars)
+    url: ${DATABASE_URL:jdbc:postgresql://${PROD_DB_HOST:localhost}:${PROD_DB_PORT:5432}/${PROD_DB_NAME:postgres}?sslmode=require&sslfactory=org.postgresql.ssl.NonValidatingFactory&tcpKeepAlive=true&socketTimeout=30&connectTimeout=30}
     username: ${PROD_DB_USERNAME:postgres}
-    password: ${PROD_DB_PASSWORD}
+    password: ${PROD_DB_PASSWORD:}
     driver-class-name: org.postgresql.Driver
     hikari:
-      connection-timeout: 30000
-      maximum-pool-size: 3  # Reduced from 10 to 3
+      # Conservative pool to avoid OOM on small containers
+      maximum-pool-size: 3
       minimum-idle: 1
-      idle-timeout: 300000
-      max-lifetime: 900000
+      connection-timeout: 30000
+      idle-timeout: 300000        # 5m
+      max-lifetime: 900000        # 15m (lower than many PG proxies)
+      keepalive-time: 120000      # 2m (under idle-timeout, reduces churn vs 30s)
       leak-detection-threshold: 60000
+      # Prefer driver's isValid(); remove next line if driver supports it well
       connection-test-query: SELECT 1
       validation-timeout: 5000
-      keepalive-time: 30000
-      register-mbeans: false  # Disable MBean registration
+      register-mbeans: false
+
   main:
     allow-bean-definition-overriding: true
+    lazy-initialization: true      # trims startup memory
+
   sql:
     init:
       mode: always
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -35,7 +41,7 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
-          batch_size: 10  # Reduced from 20
+          batch_size: 10
           batch_versioned_data: true
         connection:
           provider_disables_autocommit: true
@@ -49,34 +55,51 @@ spring:
               action: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+# Health endpoints for Docker HEALTHCHECK (keep if you use /actuator/health)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+# JSONB
 json:
   mapping:
     pretty-print: false
 
+# Password Encryption
 password:
   encryption:
     key: ${PASSWORD_ENCRYPTION_KEY:mytestkeyasdddds}
 
+# JWT
 jwt:
   issuer: planpro-app
   secret: ${JWT_SECRET:mySecretKey}
   expiration-ms: 86400000 # 24 hours
 
+# RSA keys
 rsa:
   public-key: classpath:certs/public-key.pem
   private-key: classpath:certs/private-key.pem
 
+# Logging (quieter + simple pattern)
 logging:
   level:
-    root: warn  # Changed from info to warn
-    org.hibernate: warn  # Changed from info to warn
-    org.springframework: warn  # Changed from info to warn
+    root: warn
+    org.hibernate: warn
+    org.springframework: warn
     com.planprostructure: info
-    com.zaxxer.hikari: warn  # Changed from debug to warn
-    org.springframework.jdbc: warn  # Changed from debug to warn
+    com.zaxxer.hikari: warn
+    org.springframework.jdbc: warn
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"  # Simplified log format
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 
+# File storage (matches Dockerfile path)
 file:
   server-path: /tmp/upload-files/
   client-path: /api/v1/image
@@ -84,6 +107,7 @@ file:
   base-url: ${RAILWAY_STATIC_URL:https://planpro-api-production.up.railway.app}${file.client-path}
   base-image-url: ${RAILWAY_STATIC_URL:https://planpro-api-production.up.railway.app}
 
+# Telegram (quote token; keep secret in env)
 telegram-setting:
   enable: ${TELEGRAM_BOT_ENABLE:false}
   base-url: https://api.telegram.org
@@ -92,6 +116,7 @@ telegram-setting:
   bot-url: https://t.me/${TELEGRAM_BOT_USERNAME:planproapp_bot}
   share-url: https://t.me/${TELEGRAM_BOT_USERNAME:planproapp_bot}
 
+# Swagger / OpenAPI
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
