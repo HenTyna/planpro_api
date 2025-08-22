@@ -3,17 +3,22 @@ server:
 
 spring:
   datasource:
-    # Railway PostgreSQL Configuration
-    url: ${DATABASE_URL:jdbc:postgresql://${PROD_DB_HOST}:${PROD_DB_PORT}/${PROD_DB_NAME}}
+    # Railway PostgreSQL Configuration with SSL
+    url: ${DATABASE_URL:jdbc:postgresql://${PROD_DB_HOST}:${PROD_DB_PORT}/${PROD_DB_NAME}?sslmode=require&sslfactory=org.postgresql.ssl.NonValidatingFactory&tcpKeepAlive=true&socketTimeout=30&connectTimeout=30}
     username: ${PROD_DB_USERNAME:postgres}
     password: ${PROD_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 30000
-      maximum-pool-size: 10
-      minimum-idle: 2
+      maximum-pool-size: 5
+      minimum-idle: 1
       idle-timeout: 300000
-      max-lifetime: 1200000
+      max-lifetime: 900000
+      leak-detection-threshold: 60000
+      connection-test-query: SELECT 1
+      validation-timeout: 5000
+      keepalive-time: 30000
+      register-mbeans: true
   main:
     allow-bean-definition-overriding: true
   sql:
@@ -30,6 +35,13 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+          batch_size: 20
+          batch_versioned_data: true
+        connection:
+          provider_disables_autocommit: true
+        order_inserts: true
+        order_updates: true
+        batch_fetch_style: DYNAMIC
       javax:
         persistence:
           schema-generation:
