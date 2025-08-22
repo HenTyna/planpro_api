@@ -3,10 +3,17 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://${PROD_DB_HOST}:${PROD_DB_PORT}/${PROD_DB_NAME}
-    username: ${PROD_DB_USERNAME}
+    # Railway PostgreSQL Configuration
+    url: ${DATABASE_URL:jdbc:postgresql://${PROD_DB_HOST}:${PROD_DB_PORT}/${PROD_DB_NAME}}
+    username: ${PROD_DB_USERNAME:postgres}
     password: ${PROD_DB_PASSWORD}
-    name: planpro-app
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 300000
+      max-lifetime: 1200000
   main:
     allow-bean-definition-overriding: true
   sql:
@@ -41,7 +48,7 @@ password:
     key: ${PASSWORD_ENCRYPTION_KEY:mytestkeyasdddds}
 
 # Application URLs
-# web-url: ${RAILWAY_STATIC_URL:https://your-app-name.railway.app}
+web-url: ${RAILWAY_STATIC_URL:https://your-app-name.railway.app}
 
 # JWT Configuration
 jwt:
@@ -57,8 +64,6 @@ rsa:
 
 # Logging Configuration
 logging:
-  file:
-    name: planpro-app.log
   level:
     root: info
     org.hibernate: info
@@ -72,8 +77,8 @@ file:
   server-path: /tmp/upload-files/
   client-path: /api/v1/image
   temp-path: ${file.server-path}/temp_qr
-  # base-url: ${RAILWAY_STATIC_URL:https://your-app-name.railway.app}${file.client-path}
-  # base-image-url: ${RAILWAY_STATIC_URL:https://your-app-name.railway.app}
+  base-url: ${RAILWAY_STATIC_URL:https://your-app-name.railway.app}${file.client-path}
+  base-image-url: ${RAILWAY_STATIC_URL:https://your-app-name.railway.app}
 
 # Telegram Configuration
 telegram-setting:

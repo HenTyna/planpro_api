@@ -9,6 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -22,15 +23,21 @@ public class DatabaseConfig {
     @Value("${spring.profiles.active:NOT_SET}")
     private String activeProfile;
     
+    /**
+     * Custom DataSource configuration for production/railway environments
+     * This will only be used when the 'production' or 'railway' profile is active
+     * For local development, Spring Boot's auto-configuration will handle H2
+     */
     @Bean
     @Primary
+    @Profile({"production", "railway"})
     public DataSource dataSource() {
         // Manually resolve environment variables
         String databaseUrl = resolveDatabaseUrl();
         String username = resolveUsername();
         String password = resolvePassword();
         
-        logger.info("=== Creating DataSource ===");
+        logger.info("=== Creating Production DataSource ===");
         logger.info("Database URL: {}", databaseUrl);
         logger.info("Username: {}", username);
         logger.info("Password: {}", password.equals("") ? "EMPTY" : "***HIDDEN***");
@@ -50,12 +57,18 @@ public class DatabaseConfig {
     }
     
     private String resolveDatabaseUrl() {
-        // Try multiple environment variable names
+        // Try multiple environment variable names for Railway
         String[] possibleUrls = {
             System.getenv("DATABASE_URL"),
             System.getenv("Postgres.DATABASE_URL"),
             System.getenv("POSTGRES_DATABASE_URL"),
-            System.getenv("JDBC_DATABASE_URL")
+            System.getenv("JDBC_DATABASE_URL"),
+            // Railway specific variables
+            System.getenv("PROD_DB_HOST") != null ? 
+                String.format("jdbc:postgresql://%s:%s/%s", 
+                    System.getenv("PROD_DB_HOST"),
+                    System.getenv("PROD_DB_PORT"),
+                    System.getenv("PROD_DB_NAME")) : null
         };
         
         for (String url : possibleUrls) {
@@ -64,7 +77,7 @@ public class DatabaseConfig {
             }
         }
         
-        // Fallback for local development
+        // Fallback for local PostgreSQL development
         return "jdbc:postgresql://localhost:5432/planpro";
     }
     
@@ -74,7 +87,8 @@ public class DatabaseConfig {
             System.getenv("DB_USERNAME"),
             System.getenv("Postgres.POSTGRES_USER"),
             System.getenv("POSTGRES_USER"),
-            System.getenv("PGUSER")
+            System.getenv("PGUSER"),
+            System.getenv("PROD_DB_USERNAME")
         };
         
         for (String username : possibleUsernames) {
@@ -92,7 +106,8 @@ public class DatabaseConfig {
             System.getenv("DB_PASSWORD"),
             System.getenv("Postgres.POSTGRES_PASSWORD"),
             System.getenv("POSTGRES_PASSWORD"),
-            System.getenv("PGPASSWORD")
+            System.getenv("PGPASSWORD"),
+            System.getenv("PROD_DB_PASSWORD")
         };
         
         for (String password : possiblePasswords) {
@@ -105,9 +120,10 @@ public class DatabaseConfig {
     }
     
     @Bean
+    @Profile({"production", "railway"})
     public CommandLineRunner databaseConnectionLogger(DataSource dataSource) {
         return args -> {
-            logger.info("=== Database Configuration Debug ===");
+            logger.info("=== Production Database Configuration Debug ===");
             logger.info("Active Profile: {}", activeProfile);
             
             // Show all relevant environment variables
@@ -117,6 +133,7 @@ public class DatabaseConfig {
                 "Postgres.DATABASE_URL", "Postgres.POSTGRES_USER", "Postgres.POSTGRES_PASSWORD",
                 "PGHOST", "PGPORT", "PGUSER", "PGPASSWORD",
                 "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_DATABASE_URL",
+                "PROD_DB_HOST", "PROD_DB_PORT", "PROD_DB_NAME", "PROD_DB_USERNAME", "PROD_DB_PASSWORD",
                 "SPRING_PROFILES_ACTIVE"
             };
             
@@ -131,13 +148,41 @@ public class DatabaseConfig {
             
             // Test the actual connection
             try (Connection connection = dataSource.getConnection()) {
-                logger.info("✅ Database connection successful!");
+                logger.info("✅ Production database connection successful!");
                 logger.info("Database Product: {}", connection.getMetaData().getDatabaseProductName());
                 logger.info("Database Version: {}", connection.getMetaData().getDatabaseProductVersion());
             } catch (SQLException e) {
-                logger.error("❌ Database connection failed: {}", e.getMessage());
+                logger.error("❌ Production database connection failed: {}", e.getMessage());
                 logger.error("SQL State: {}", e.getSQLState());
                 logger.error("Error Code: {}", e.getErrorCode());
+            }
+            
+            logger.info("=====================================");
+        };
+    }
+    
+    /**
+     * Local development database connection logger
+     * This will only run for local profile to show H2 connection info
+     */
+    @Bean
+    @Profile("local")
+    public CommandLineRunner localDatabaseConnectionLogger(DataSource dataSource) {
+        return args -> {
+            logger.info("=== Local Development Database Configuration ===");
+            logger.info("Active Profile: {}", activeProfile);
+            logger.info("Using H2 in-memory database for local development");
+            
+            try (Connection connection = dataSource.getConnection()) {
+                logger.info("✅ H2 database connection successful!");
+                logger.info("Database Product: {}", connection.getMetaData().getDatabaseProductName());
+                logger.info("Database Version: {}", connection.getMetaData().getDatabaseProductVersion());
+                logger.info("H2 Console available at: http://localhost:8080/h2-console");
+                logger.info("JDBC URL: jdbc:h2:mem:planpro");
+                logger.info("Username: sa");
+                logger.info("Password: (empty)");
+            } catch (SQLException e) {
+                logger.error("❌ H2 database connection failed: {}", e.getMessage());
             }
             
             logger.info("=====================================");

@@ -1,4 +1,4 @@
--- PlanPro Database Schema
+-- PlanPro Database Schema for PostgreSQL
 -- This schema defines all tables for the PlanPro travel planning application
 
 -- =====================================================
@@ -7,7 +7,7 @@
 
 -- Users table - Core user information
 CREATE TABLE tb_user (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
     telegram_id BIGINT UNIQUE,
     usr_dob VARCHAR(255),
@@ -15,7 +15,7 @@ CREATE TABLE tb_user (
     usr_ln VARCHAR(255),
     pwd VARCHAR(255),
     email VARCHAR(255) UNIQUE NOT NULL,
-    role ENUM('USER', 'ADMIN') DEFAULT 'USER',
+    role VARCHAR(10) DEFAULT 'USER' CHECK (role IN ('USER', 'ADMIN')),
     phone VARCHAR(255) UNIQUE NOT NULL,
     sts CHAR(1) DEFAULT '1' NOT NULL, -- StatusUser enum: 1=ACTIVE, 2=INACTIVE, 3=SUSPENDED, 4=DELETED
     reset_token VARCHAR(255),
@@ -23,12 +23,14 @@ CREATE TABLE tb_user (
     gender VARCHAR(50),
     profile_image_url VARCHAR(500),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    change_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_user_email (email),
-    INDEX idx_user_username (username),
-    INDEX idx_user_telegram (telegram_id),
-    INDEX idx_user_status (sts)
+    change_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Create indexes for users table
+CREATE INDEX idx_user_email ON tb_user(email);
+CREATE INDEX idx_user_username ON tb_user(username);
+CREATE INDEX idx_user_telegram ON tb_user(telegram_id);
+CREATE INDEX idx_user_status ON tb_user(sts);
 
 -- =====================================================
 -- TRIPS AND DESTINATIONS
@@ -36,7 +38,7 @@ CREATE TABLE tb_user (
 
 -- Trips table - Main trip information
 CREATE TABLE tb_trips (
-    trip_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    trip_id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
@@ -56,27 +58,31 @@ CREATE TABLE tb_trips (
     is_cal_event BOOLEAN DEFAULT FALSE,
     is_notify BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    change_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES tb_user(id) ON DELETE CASCADE,
-    INDEX idx_trips_user (user_id),
-    INDEX idx_trips_status (status),
-    INDEX idx_trips_category (cate),
-    INDEX idx_trips_dates (start_date, end_date)
+    change_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_trips_user FOREIGN KEY (user_id) REFERENCES tb_user(id) ON DELETE CASCADE
 );
+
+-- Create indexes for trips table
+CREATE INDEX idx_trips_user ON tb_trips(user_id);
+CREATE INDEX idx_trips_status ON tb_trips(status);
+CREATE INDEX idx_trips_category ON tb_trips(cate);
+CREATE INDEX idx_trips_dates ON tb_trips(start_date, end_date);
 
 -- Destinations table - Trip destinations
 CREATE TABLE tb_destinations (
-    destination_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    destination_id BIGSERIAL PRIMARY KEY,
     id VARCHAR(255),        -- destDate
     trip_id BIGINT NOT NULL,
     destination_name VARCHAR(255),
-    days INT,
+    days INTEGER,
     activity TEXT,          -- Activities
     status CHAR(1) DEFAULT '1', -- Status: 1=NORMAL, 9=DISABLE
-    FOREIGN KEY (trip_id) REFERENCES tb_trips(trip_id) ON DELETE CASCADE,
-    INDEX idx_destinations_trip (trip_id),
-    INDEX idx_destinations_status (status)
+    CONSTRAINT fk_destinations_trip FOREIGN KEY (trip_id) REFERENCES tb_trips(trip_id) ON DELETE CASCADE
 );
+
+-- Create indexes for destinations table
+CREATE INDEX idx_destinations_trip ON tb_destinations(trip_id);
+CREATE INDEX idx_destinations_status ON tb_destinations(status);
 
 -- =====================================================
 -- CALENDAR EVENTS
@@ -84,7 +90,7 @@ CREATE TABLE tb_destinations (
 
 -- Calendar table - Calendar events
 CREATE TABLE tb_calendar (
-    cal_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    cal_id BIGSERIAL PRIMARY KEY,
     event_title VARCHAR(255) NOT NULL,
     start_date VARCHAR(14) NOT NULL, -- Format: YYYYMMDDHHMMSS
     end_date VARCHAR(14) NOT NULL,   -- Format: YYYYMMDDHHMMSS
@@ -100,14 +106,16 @@ CREATE TABLE tb_calendar (
     attendees TEXT,         -- Comma-separated user IDs
     is_notify BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    change_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (trip_id) REFERENCES tb_trips(trip_id) ON DELETE SET NULL,
-    FOREIGN KEY (user_id) REFERENCES tb_user(id) ON DELETE CASCADE,
-    INDEX idx_calendar_user (user_id),
-    INDEX idx_calendar_trip (trip_id),
-    INDEX idx_calendar_dates (start_date, end_date),
-    INDEX idx_calendar_status (status)
+    change_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_calendar_trip FOREIGN KEY (trip_id) REFERENCES tb_trips(trip_id) ON DELETE SET NULL,
+    CONSTRAINT fk_calendar_user FOREIGN KEY (user_id) REFERENCES tb_user(id) ON DELETE CASCADE
 );
+
+-- Create indexes for calendar table
+CREATE INDEX idx_calendar_user ON tb_calendar(user_id);
+CREATE INDEX idx_calendar_trip ON tb_calendar(trip_id);
+CREATE INDEX idx_calendar_dates ON tb_calendar(start_date, end_date);
+CREATE INDEX idx_calendar_status ON tb_calendar(status);
 
 -- =====================================================
 -- NOTES
@@ -115,7 +123,7 @@ CREATE TABLE tb_calendar (
 
 -- My Notes table - User notes
 CREATE TABLE tb_my_notes (
-    note_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    note_id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
@@ -126,11 +134,13 @@ CREATE TABLE tb_my_notes (
     is_deleted BOOLEAN DEFAULT FALSE,
     is_calendar_event BOOLEAN DEFAULT FALSE,
     is_notify BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (user_id) REFERENCES tb_user(id) ON DELETE CASCADE,
-    INDEX idx_notes_user (user_id),
-    INDEX idx_notes_deleted (is_deleted),
-    INDEX idx_notes_calendar (is_calendar_event)
+    CONSTRAINT fk_notes_user FOREIGN KEY (user_id) REFERENCES tb_user(id) ON DELETE CASCADE
 );
+
+-- Create indexes for notes table
+CREATE INDEX idx_notes_user ON tb_my_notes(user_id);
+CREATE INDEX idx_notes_deleted ON tb_my_notes(is_deleted);
+CREATE INDEX idx_notes_calendar ON tb_my_notes(is_calendar_event);
 
 -- =====================================================
 -- FILE MANAGEMENT
@@ -138,21 +148,23 @@ CREATE TABLE tb_my_notes (
 
 -- Folders table - File organization
 CREATE TABLE tb_folder (
-    folder_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    folder_id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     user_id BIGINT NOT NULL,
     telegram_id BIGINT,
     file_id BIGINT,
     created_at TIMESTAMP NOT NULL,
     status CHAR(1) DEFAULT '1', -- Status: 1=NORMAL, 9=DISABLE
-    FOREIGN KEY (user_id) REFERENCES tb_user(id) ON DELETE CASCADE,
-    INDEX idx_folder_user (user_id),
-    INDEX idx_folder_status (status)
+    CONSTRAINT fk_folder_user FOREIGN KEY (user_id) REFERENCES tb_user(id) ON DELETE CASCADE
 );
+
+-- Create indexes for folder table
+CREATE INDEX idx_folder_user ON tb_folder(user_id);
+CREATE INDEX idx_folder_status ON tb_folder(status);
 
 -- Files table - File storage
 CREATE TABLE tb_file (
-    file_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    file_id BIGSERIAL PRIMARY KEY,
     file_name VARCHAR(255) NOT NULL,
     stored_name VARCHAR(255) NOT NULL,
     file_url VARCHAR(500) NOT NULL,
@@ -163,18 +175,20 @@ CREATE TABLE tb_file (
     folder_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
     uploaded_at TIMESTAMP NOT NULL,
-    width INT,
-    height INT,
+    width INTEGER,
+    height INTEGER,
     thumbnail_path VARCHAR(500),
     status CHAR(1) DEFAULT '1', -- Status: 1=NORMAL, 9=DISABLE
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (folder_id) REFERENCES tb_folder(folder_id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES tb_user(id) ON DELETE CASCADE,
-    INDEX idx_file_user (user_id),
-    INDEX idx_file_folder (folder_id),
-    INDEX idx_file_type (file_type),
-    INDEX idx_file_status (status)
+    CONSTRAINT fk_file_folder FOREIGN KEY (folder_id) REFERENCES tb_folder(folder_id) ON DELETE CASCADE,
+    CONSTRAINT fk_file_user FOREIGN KEY (user_id) REFERENCES tb_user(id) ON DELETE CASCADE
 );
+
+-- Create indexes for file table
+CREATE INDEX idx_file_user ON tb_file(user_id);
+CREATE INDEX idx_file_folder ON tb_file(folder_id);
+CREATE INDEX idx_file_type ON tb_file(file_type);
+CREATE INDEX idx_file_status ON tb_file(status);
 
 -- =====================================================
 -- CHAT SYSTEM
@@ -183,14 +197,16 @@ CREATE TABLE tb_file (
 -- Conversations table - Chat conversations
 CREATE TABLE conversations (
     id VARCHAR(255) PRIMARY KEY,
-    type ENUM('DIRECT', 'GROUP') NOT NULL,
+    type VARCHAR(10) NOT NULL CHECK (type IN ('DIRECT', 'GROUP')),
     title VARCHAR(255),
     photo_url VARCHAR(500),
     created_by VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_conversations_type (type),
-    INDEX idx_conversations_created_by (created_by)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Create indexes for conversations table
+CREATE INDEX idx_conversations_type ON conversations(type);
+CREATE INDEX idx_conversations_created_by ON conversations(created_by);
 
 -- Messages table - Chat messages
 CREATE TABLE messages (
@@ -203,13 +219,15 @@ CREATE TABLE messages (
     mentions_json TEXT,
     edited BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    status ENUM('SENT', 'DELETED') DEFAULT 'SENT',
-    FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE,
-    INDEX idx_messages_conv_seq (conversation_id, message_seq),
-    INDEX idx_messages_conv_created (conversation_id, created_at DESC),
-    INDEX idx_messages_sender (sender_id)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(10) DEFAULT 'SENT' CHECK (status IN ('SENT', 'DELETED')),
+    CONSTRAINT fk_messages_conversation FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE
 );
+
+-- Create indexes for messages table
+CREATE INDEX idx_messages_conv_seq ON messages(conversation_id, message_seq);
+CREATE INDEX idx_messages_conv_created ON messages(conversation_id, created_at DESC);
+CREATE INDEX idx_messages_sender ON messages(sender_id);
 
 -- Conversation Participants table
 CREATE TABLE conversation_participants (
@@ -217,7 +235,7 @@ CREATE TABLE conversation_participants (
     user_id VARCHAR(255) NOT NULL,
     joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (conversation_id, user_id),
-    FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE
+    CONSTRAINT fk_participants_conversation FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE
 );
 
 -- Message Reactions table
@@ -227,17 +245,17 @@ CREATE TABLE message_reactions (
     reaction VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (message_id, user_id),
-    FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE
+    CONSTRAINT fk_reactions_message FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE
 );
 
 -- Message Receipts table
 CREATE TABLE message_receipts (
     message_id VARCHAR(255) NOT NULL,
     user_id VARCHAR(255) NOT NULL,
-    status ENUM('READ', 'DELIVERED') NOT NULL,
+    status VARCHAR(10) NOT NULL CHECK (status IN ('READ', 'DELIVERED')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (message_id, user_id),
-    FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE
+    CONSTRAINT fk_receipts_message FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE
 );
 
 -- Contacts table
@@ -246,10 +264,12 @@ CREATE TABLE contacts (
     user_id VARCHAR(255) NOT NULL,
     contact_user_id VARCHAR(255) NOT NULL,
     nickname VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_contacts_user (user_id),
-    INDEX idx_contacts_contact (contact_user_id)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Create indexes for contacts table
+CREATE INDEX idx_contacts_user ON contacts(user_id);
+CREATE INDEX idx_contacts_contact ON contacts(contact_user_id);
 
 -- Block table - User blocking
 CREATE TABLE blocks (
@@ -267,9 +287,11 @@ CREATE TABLE attachments (
     file_type VARCHAR(50),
     file_name VARCHAR(255),
     file_size BIGINT,
-    FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE,
-    INDEX idx_attachments_message (message_id)
+    CONSTRAINT fk_attachments_message FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE
 );
+
+-- Create index for attachments table
+CREATE INDEX idx_attachments_message ON attachments(message_id);
 
 -- =====================================================
 -- TELEGRAM BOT (if needed)
@@ -277,16 +299,18 @@ CREATE TABLE attachments (
 
 -- Telegram Bot Sessions table (placeholder for future use)
 CREATE TABLE telegram_bot_sessions (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     telegram_id BIGINT NOT NULL,
     session_data TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES tb_user(id) ON DELETE CASCADE,
-    UNIQUE KEY uk_telegram_session (telegram_id),
-    INDEX idx_telegram_bot_user (user_id)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_telegram_bot_user FOREIGN KEY (user_id) REFERENCES tb_user(id) ON DELETE CASCADE,
+    CONSTRAINT uk_telegram_session UNIQUE (telegram_id)
 );
+
+-- Create index for telegram bot sessions table
+CREATE INDEX idx_telegram_bot_user ON telegram_bot_sessions(user_id);
 
 -- =====================================================
 -- SECURITY (if needed)
@@ -294,7 +318,7 @@ CREATE TABLE telegram_bot_sessions (
 
 -- User Sessions table (placeholder for future use)
 CREATE TABLE user_sessions (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     session_token VARCHAR(255) UNIQUE NOT NULL,
     ip_address VARCHAR(45),
@@ -302,11 +326,13 @@ CREATE TABLE user_sessions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expires_at TIMESTAMP NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (user_id) REFERENCES tb_user(id) ON DELETE CASCADE,
-    INDEX idx_sessions_user (user_id),
-    INDEX idx_sessions_token (session_token),
-    INDEX idx_sessions_expires (expires_at)
+    CONSTRAINT fk_sessions_user FOREIGN KEY (user_id) REFERENCES tb_user(id) ON DELETE CASCADE
 );
+
+-- Create indexes for user sessions table
+CREATE INDEX idx_sessions_user ON user_sessions(user_id);
+CREATE INDEX idx_sessions_token ON user_sessions(session_token);
+CREATE INDEX idx_sessions_expires ON user_sessions(expires_at);
 
 -- =====================================================
 -- INDEXES FOR PERFORMANCE
@@ -320,11 +346,48 @@ CREATE INDEX idx_files_user_type ON tb_file(user_id, file_type);
 CREATE INDEX idx_messages_status_created ON messages(status, created_at);
 
 -- =====================================================
+-- TRIGGERS FOR UPDATED TIMESTAMPS
+-- =====================================================
+
+-- Function to update change_at timestamp
+CREATE OR REPLACE FUNCTION update_change_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.change_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- Create triggers for tables with change_at column
+CREATE TRIGGER update_tb_user_change_at BEFORE UPDATE ON tb_user
+    FOR EACH ROW EXECUTE FUNCTION update_change_at_column();
+
+CREATE TRIGGER update_tb_trips_change_at BEFORE UPDATE ON tb_trips
+    FOR EACH ROW EXECUTE FUNCTION update_change_at_column();
+
+CREATE TRIGGER update_tb_calendar_change_at BEFORE UPDATE ON tb_calendar
+    FOR EACH ROW EXECUTE FUNCTION update_change_at_column();
+
+CREATE TRIGGER update_telegram_bot_sessions_change_at BEFORE UPDATE ON telegram_bot_sessions
+    FOR EACH ROW EXECUTE FUNCTION update_change_at_column();
+
+-- =====================================================
 -- COMMENTS AND DOCUMENTATION
 -- =====================================================
 
+COMMENT ON TABLE tb_user IS 'Core user information with authentication and profile data';
+COMMENT ON TABLE tb_trips IS 'Main trip planning information with categories and status tracking';
+COMMENT ON TABLE tb_destinations IS 'Trip destinations with activities and scheduling';
+COMMENT ON TABLE tb_calendar IS 'Calendar events with trip integration and notifications';
+COMMENT ON TABLE tb_my_notes IS 'User notes with color coding and calendar integration';
+COMMENT ON TABLE tb_folder IS 'File organization hierarchy';
+COMMENT ON TABLE tb_file IS 'File storage with metadata and Telegram integration';
+COMMENT ON TABLE conversations IS 'Chat conversations (direct and group)';
+COMMENT ON TABLE messages IS 'Chat messages with threading and reactions';
+COMMENT ON TABLE telegram_bot_sessions IS 'Telegram bot session management';
+
 /*
-PlanPro Database Schema Documentation
+PlanPro Database Schema Documentation for PostgreSQL
 
 This schema supports a comprehensive travel planning application with the following features:
 
@@ -388,4 +451,11 @@ DATE FORMATS:
 - Standard dates: YYYY-MM-DD HH:MM:SS (TIMESTAMP)
 - Compact dates: YYYYMMDDHHMMSS (VARCHAR(14))
 - Time only: HHMMSS (VARCHAR(6))
+
+POSTGRESQL SPECIFIC FEATURES:
+- BIGSERIAL for auto-incrementing primary keys
+- CHECK constraints for enum validation
+- Triggers for automatic timestamp updates
+- Proper foreign key constraints with cascade rules
+- Optimized indexes for PostgreSQL query planner
 */
