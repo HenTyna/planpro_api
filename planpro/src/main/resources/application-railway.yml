@@ -47,9 +47,6 @@ password:
   encryption:
     key: ${PASSWORD_ENCRYPTION_KEY:mytestkeyasdddds}
 
-# Application URLs
-web-url: ${RAILWAY_STATIC_URL:https://your-app-name.railway.app}
-
 # JWT Configuration
 jwt:
   expiration: 86400000 # 24 hours in milliseconds
@@ -77,8 +74,8 @@ file:
   server-path: /tmp/upload-files/
   client-path: /api/v1/image
   temp-path: ${file.server-path}/temp_qr
-  base-url: ${RAILWAY_STATIC_URL:https://your-app-name.railway.app}${file.client-path}
-  base-image-url: ${RAILWAY_STATIC_URL:https://your-app-name.railway.app}
+  base-url: ${RAILWAY_STATIC_URL:https://planpro-api-production.up.railway.app}${file.client-path}
+  base-image-url: ${RAILWAY_STATIC_URL:https://planpro-api-production.up.railway.app}
 
 # Telegram Configuration
 telegram-setting:
