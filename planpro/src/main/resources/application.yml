@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:production}
+    active: production
     include: quartz
   main:
     allow-circular-references: true
