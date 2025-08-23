@@ -9,17 +9,17 @@ spring:
     password: ${PROD_DB_PASSWORD:}
     driver-class-name: org.postgresql.Driver
     hikari:
-      # Conservative pool to avoid OOM on small containers
-      maximum-pool-size: 3
-      minimum-idle: 1
-      connection-timeout: 30000
+      # Very conservative pool for Railway's memory constraints
+      maximum-pool-size: 2
+      minimum-idle: 0
+      connection-timeout: 20000
       idle-timeout: 300000        # 5m
-      max-lifetime: 900000        # 15m (lower than many PG proxies)
-      keepalive-time: 120000      # 2m (under idle-timeout, reduces churn vs 30s)
-      leak-detection-threshold: 60000
+      max-lifetime: 600000        # 10m (reduced from 15m)
+      keepalive-time: 60000       # 1m (reduced from 2m)
+      leak-detection-threshold: 30000
       # Prefer driver's isValid(); remove next line if driver supports it well
       connection-test-query: SELECT 1
-      validation-timeout: 5000
+      validation-timeout: 3000
       register-mbeans: false
 
   main:
@@ -41,13 +41,17 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
-          batch_size: 10
+          batch_size: 5  # Reduced from 10
           batch_versioned_data: true
         connection:
           provider_disables_autocommit: true
         order_inserts: true
         order_updates: true
         batch_fetch_style: DYNAMIC
+        # Reduce second-level cache usage
+        cache:
+          use_second_level_cache: false
+          use_query_cache: false
       javax:
         persistence:
           schema-generation:
@@ -65,6 +69,11 @@ management:
     health:
       probes:
         enabled: true
+      # Add database health check
+      group:
+        db:
+          include: db
+          show-details: when-authorized
 
 # JSONB
 json:
