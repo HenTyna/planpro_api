@@ -91,10 +91,10 @@ jwt:
   secret: ${JWT_SECRET:mySecretKey}
   expiration-ms: 86400000 # 24 hours
 
-# RSA keys
-rsa:
-  public-key: classpath:certs/public-key.pem
-  private-key: classpath:certs/private-key.pem
+# RSA keys - Commented out for Railway deployment since certs don't exist
+# rsa:
+#   public-key: classpath:certs/public-key.pem
+#   private-key: classpath:certs/private-key.pem
 
 # Logging (quieter + simple pattern)
 logging:

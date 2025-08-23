@@ -1,0 +1,12 @@
+[build]
+builder = "dockerfile"
+
+[deploy]
+startCommand = "java -Dserver.port=$PORT -jar app.jar"
+healthcheckPath = "/actuator/health"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+[deploy.envs]
+JAVA_TOOL_OPTIONS = "-XX:+UseContainerSupport -XX:MaxRAMPercentage=40 -XX:MinRAMPercentage=20 -XX:+ExitOnOutOfMemoryError -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+UseStringDeduplication -XX:+OptimizeStringConcat -Dfile.encoding=UTF-8 -Dspring.profiles.active=railway"

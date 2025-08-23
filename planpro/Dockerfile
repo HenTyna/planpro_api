@@ -15,6 +15,9 @@ RUN ./gradlew clean bootJar -x test --no-daemon
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
+# Install curl for health checks
+RUN apk add --no-cache curl
+
 # Create the directory your app actually uses (matches application.yml)
 RUN mkdir -p /tmp/upload-files/temp_qr
 
@@ -26,11 +29,11 @@ EXPOSE 8080
 
 # JVM tuned for Railway's memory constraints
 # Railway typically provides 512MB-1GB RAM, so we need to be very conservative
-ENV JAVA_TOOL_OPTIONS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=50 -XX:MinRAMPercentage=25 -XX:+ExitOnOutOfMemoryError -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Dfile.encoding=UTF-8 -Dspring.profiles.active=railway"
+ENV JAVA_TOOL_OPTIONS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=40 -XX:MinRAMPercentage=20 -XX:+ExitOnOutOfMemoryError -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+UseStringDeduplication -XX:+OptimizeStringConcat -Dfile.encoding=UTF-8 -Dspring.profiles.active=railway"
 
-# Remove healthcheck for now - it can cause issues on Railway
-# HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=5 \
-#   CMD curl -fsS "http://localhost:${PORT:-8080}/actuator/health" | grep -q '"status":"UP"' || exit 1
+# Healthcheck for Railway
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+  CMD curl -f http://localhost:${PORT:-8080}/actuator/health || exit 1
 
 # Run on the port Railway provides (fallback 8080 locally)
 # Use exec form for better signal handling
