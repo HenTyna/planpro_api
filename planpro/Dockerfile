@@ -21,10 +21,6 @@ RUN mkdir -p /tmp/upload-files/temp_qr
 # Copy the fat jar
 COPY --from=builder /app/build/libs/*.jar app.jar
 
-# Copy startup script
-COPY startup.sh /app/startup.sh
-RUN chmod +x /app/startup.sh
-
 # Do NOT rely on env in EXPOSE; it's a build-time hint only
 EXPOSE 8080
 
@@ -37,5 +33,5 @@ ENV JAVA_TOOL_OPTIONS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=50 -XX:MinR
 #   CMD curl -fsS "http://localhost:${PORT:-8080}/actuator/health" | grep -q '"status":"UP"' || exit 1
 
 # Run on the port Railway provides (fallback 8080 locally)
-# Use startup script for better error handling
-ENTRYPOINT ["/app/startup.sh"]
+# Use exec form for better signal handling
+ENTRYPOINT ["java", "-Dserver.port=${PORT:-8080}", "-jar", "app.jar"]

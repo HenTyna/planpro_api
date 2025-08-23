@@ -6,3 +6,7 @@ build/
 node_modules
 README.md
 .env
+.vscode/
+.idea/
+*.md
+startup.sh

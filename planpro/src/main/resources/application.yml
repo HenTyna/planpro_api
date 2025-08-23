@@ -7,6 +7,6 @@ spring:
 jwt:
   expiration: 2h
 
-rsa:
-  public-key: classpath:certs/public-key.pem
-  private-key: classpath:certs/private-key.pem
+# rsa:
+#   public-key: classpath:certs/public-key.pem
+#   private-key: classpath:certs/private-key.pem
