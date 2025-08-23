@@ -1,5 +1,5 @@
 server:
-  port: ${PORT:8080}   # ✅ Correct placeholder, Railway auto-injects PORT
+  port: ${PORT:8080}   # Railway auto-injects PORT environment variable
 
 spring:
   datasource:
