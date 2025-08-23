@@ -24,6 +24,10 @@ RUN mkdir -p /tmp/upload-files/temp_qr
 # Copy the fat jar
 COPY --from=builder /app/build/libs/*.jar app.jar
 
+# Copy startup script
+COPY startup.sh startup.sh
+RUN chmod +x startup.sh
+
 # Do NOT rely on env in EXPOSE; it's a build-time hint only
 EXPOSE 8080
 
@@ -31,10 +35,13 @@ EXPOSE 8080
 # Railway typically provides 512MB-1GB RAM, so we need to be very conservative
 ENV JAVA_TOOL_OPTIONS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=40 -XX:MinRAMPercentage=20 -XX:+ExitOnOutOfMemoryError -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+UseStringDeduplication -XX:+OptimizeStringConcat -Dfile.encoding=UTF-8 -Dspring.profiles.active=railway"
 
+# Set default port for Railway
+ENV PORT=8080
+
 # Healthcheck for Railway
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
   CMD curl -f http://localhost:${PORT:-8080}/actuator/health || exit 1
 
 # Run on the port Railway provides (fallback 8080 locally)
 # Use exec form for better signal handling
-ENTRYPOINT ["java", "-Dserver.port=${PORT:-8080}", "-jar", "app.jar"]
+ENTRYPOINT ["./startup.sh"]

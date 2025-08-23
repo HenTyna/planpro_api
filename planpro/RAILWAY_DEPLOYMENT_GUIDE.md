@@ -93,6 +93,8 @@ railway up
 **Solution**:
 - Railway automatically sets the PORT environment variable
 - Application is configured to use `$PORT` or fallback to 8080
+- Added explicit management server port configuration
+- Created RailwayConfig class to handle port parsing safely
 
 #### 4. RSA Key Issues
 **Symptoms**: Application fails to start due to missing certificate files

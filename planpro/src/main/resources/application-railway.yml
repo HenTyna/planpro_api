@@ -61,10 +61,13 @@ spring:
 
 # Health endpoints for Docker HEALTHCHECK (keep if you use /actuator/health)
 management:
+  server:
+    port: ${PORT:8080}
   endpoints:
     web:
       exposure:
         include: health,info
+      base-path: /actuator
   endpoint:
     health:
       probes:

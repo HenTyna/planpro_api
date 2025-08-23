@@ -7,6 +7,10 @@ echo "Starting PlanPro API on Railway..."
 export PORT=${PORT:-8080}
 export SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-railway}
 
+# Ensure PORT is properly set for Spring Boot
+export SERVER_PORT=$PORT
+export MANAGEMENT_SERVER_PORT=$PORT
+
 # Ensure required directories exist
 mkdir -p /tmp/upload-files/temp_qr
 
