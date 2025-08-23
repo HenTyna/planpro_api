@@ -23,19 +23,22 @@ gradle-app.setting
 !gradle-wrapper.properties
 
 # Test files
-src/test/
+# (keep tests in repo, only ignore outputs if needed)
+# src/test/
 
 # Documentation
-README.md
-*.md
+# Keep README.md
+# *.md   <-- remove this if you want docs visible
 
 # Docker
-Dockerfile
+# Keep Dockerfile for Railway
+# Dockerfile
 .dockerignore
 
 # Railway
-railway.json
-railway.toml
+# Keep Railway configs if you use them
+# railway.json
+# railway.toml
 
 # Environment files
 .env
