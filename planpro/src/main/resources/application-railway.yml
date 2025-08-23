@@ -17,7 +17,7 @@ spring:
       keepalive-time: 60000       # 1m
       leak-detection-threshold: 30000
       connection-test-query: SELECT 1
-      validation-timeout: 3000
+      validation-timeout: 5000
       register-mbeans: false
 
   main:

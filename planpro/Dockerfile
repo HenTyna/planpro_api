@@ -32,8 +32,8 @@ RUN chmod +x startup.sh
 EXPOSE 8080
 
 # JVM tuned for Railway's memory constraints
-# Railway typically provides 512MB-1GB RAM, so we need to be very conservative
-ENV JAVA_TOOL_OPTIONS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=40 -XX:MinRAMPercentage=20 -XX:+ExitOnOutOfMemoryError -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+UseStringDeduplication -XX:+OptimizeStringConcat -Dfile.encoding=UTF-8 -Dspring.profiles.active=railway"
+# Railway typically provides 512MB-1GB RAM, so we need to be conservative
+# Note: JAVA_TOOL_OPTIONS will be set by startup.sh
 
 # Set default port for Railway
 ENV PORT=8080
