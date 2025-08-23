@@ -40,5 +40,14 @@ echo "PROD_DB_HOST: ${PROD_DB_HOST:-NOT_SET}"
 echo "PROD_DB_USERNAME: ${PROD_DB_USERNAME:-NOT_SET}"
 echo "PROD_DB_PASSWORD: ${PROD_DB_PASSWORD:-NOT_SET}"
 
-# Start with verbose logging to see what's happening
-exec java -jar app.jar --debug
+# Start with verbose logging and error handling
+echo "Starting Java application with debug logging..."
+echo "Setting startup timeout to prevent hanging..."
+
+# Start the application with timeout and debug logging
+timeout 120 java -jar app.jar --debug --logging.level.root=DEBUG --logging.level.com.planprostructure=DEBUG || {
+    echo "Application failed to start within 120 seconds or crashed"
+    echo "Last 50 lines of logs:"
+    tail -n 50 /app/planpro-app.log 2>/dev/null || echo "No log file found"
+    exit 1
+}
