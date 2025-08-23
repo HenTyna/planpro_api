@@ -1,52 +1,11 @@
-# Multi-stage build for Railway deployment
-FROM gradle:8.5-jdk17 AS build
+# Use lightweight JDK image
+FROM openjdk:17-jdk-slim 
 
 # Set working directory
 WORKDIR /app
 
-# Copy gradle files first for better caching
-COPY gradle/ gradle/
-COPY gradlew build.gradle settings.gradle ./
+# Copy built JAR file
+COPY build/libs/*.jar app.jar
 
-# Download dependencies
-RUN ./gradlew dependencies --no-daemon
-
-# Copy source code
-COPY src/ src/
-
-# Build the application
-RUN ./gradlew build -x test --no-daemon
-
-# Runtime stage
-FROM openjdk:17-jre-slim
-
-# Install necessary packages
-RUN apt-get update && apt-get install -y \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Create app user
-RUN groupadd -r appuser && useradd -r -g appuser appuser
-
-# Set working directory
-WORKDIR /app
-
-# Copy the built jar from build stage
-COPY --from=build /app/build/libs/*.jar app.jar
-
-# Create necessary directories
-RUN mkdir -p /tmp/upload-files && \
-    chown -R appuser:appuser /app /tmp/upload-files
-
-# Switch to app user
-USER appuser
-
-# Expose port
-EXPOSE 8080
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
-
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run the Spring Boot app
+CMD ["java", "-jar", "app.jar"]
