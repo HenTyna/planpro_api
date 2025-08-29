@@ -15,28 +15,33 @@ RUN ./gradlew clean bootJar -x test --no-daemon
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
+# Install curl for health checks
+RUN apk add --no-cache curl
+
 # Create the directory your app actually uses (matches application.yml)
 RUN mkdir -p /tmp/upload-files/temp_qr
-
-# Optional: add curl only if you keep a healthcheck
-RUN apk add --no-cache curl
 
 # Copy the fat jar
 COPY --from=builder /app/build/libs/*.jar app.jar
 
-# Do NOT rely on env in EXPOSE; it’s a build-time hint only
+# Copy startup script
+COPY startup.sh startup.sh
+RUN chmod +x startup.sh
+
+# Do NOT rely on env in EXPOSE; it's a build-time hint only
 EXPOSE 8080
 
-# JVM tuned for container limits (let the JVM size itself to a % of cgroup memory)
-# Remove the hard -Xmx and use RAM percentages instead
-ENV JAVA_TOOL_OPTIONS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=70 -XX:MinRAMPercentage=20 -XX:+ExitOnOutOfMemoryError -Dfile.encoding=UTF-8"
+# JVM tuned for Railway's memory constraints
+# Railway typically provides 512MB-1GB RAM, so we need to be conservative
+# Note: JAVA_TOOL_OPTIONS will be set by startup.sh
 
-# If you actually have Spring Boot Actuator on the classpath, keep this.
-# Give the app time to warm up (increase start-period); otherwise, comment out the HEALTHCHECK.
-HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=5 \
-  CMD curl -fsS "http://localhost:${PORT:-8080}/actuator/health" | grep -q '"status":"UP"' || exit 1
+# Set default port for Railway
+ENV PORT=8080
+
+# Healthcheck for Railway
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+  CMD curl -f http://localhost:${PORT:-8080}/actuator/health || exit 1
 
 # Run on the port Railway provides (fallback 8080 locally)
-ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT:-8080} -jar app.jar"]
-
-# End of Selection
+# Use exec form for better signal handling
+ENTRYPOINT ["./startup.sh"]

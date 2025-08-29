@@ -1,38 +1,40 @@
 server:
-  port: ${PORT:8080}
+  port: ${PORT:8080}   # Railway auto-injects PORT environment variable
 
 spring:
   datasource:
-    # Railway PostgreSQL with SSL (uses DATABASE_URL if present; otherwise falls back to individual vars)
+    # Railway PostgreSQL with SSL (falls back to PROD_* vars if DATABASE_URL is missing)
     url: ${DATABASE_URL:jdbc:postgresql://${PROD_DB_HOST:localhost}:${PROD_DB_PORT:5432}/${PROD_DB_NAME:postgres}?sslmode=require&sslfactory=org.postgresql.ssl.NonValidatingFactory&tcpKeepAlive=true&socketTimeout=30&connectTimeout=30}
     username: ${PROD_DB_USERNAME:postgres}
     password: ${PROD_DB_PASSWORD:}
     driver-class-name: org.postgresql.Driver
     hikari:
-      # Conservative pool to avoid OOM on small containers
-      maximum-pool-size: 3
-      minimum-idle: 1
-      connection-timeout: 30000
+      fail-fast: false
+      maximum-pool-size: 2   # small pool for Railway
+      minimum-idle: 0
+      connection-timeout: 10000
       idle-timeout: 300000        # 5m
-      max-lifetime: 900000        # 15m (lower than many PG proxies)
-      keepalive-time: 120000      # 2m (under idle-timeout, reduces churn vs 30s)
-      leak-detection-threshold: 60000
-      # Prefer driver's isValid(); remove next line if driver supports it well
+      max-lifetime: 600000        # 10m
+      keepalive-time: 60000       # 1m
+      leak-detection-threshold: 30000
       connection-test-query: SELECT 1
-      validation-timeout: 5000
+      validation-timeout: 3000
       register-mbeans: false
+      initialization-fail-timeout: 10000
 
   main:
     allow-bean-definition-overriding: true
-    lazy-initialization: true      # trims startup memory
+    lazy-initialization: true
+    banner-mode: console
+    web-application-type: servlet
 
   sql:
     init:
-      mode: always
+      mode: never
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: false
     properties:
       hibernate:
@@ -41,13 +43,16 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
-          batch_size: 10
+          batch_size: 5
           batch_versioned_data: true
         connection:
           provider_disables_autocommit: true
         order_inserts: true
         order_updates: true
         batch_fetch_style: DYNAMIC
+        cache:
+          use_second_level_cache: false
+          use_query_cache: false
       javax:
         persistence:
           schema-generation:
@@ -55,16 +60,22 @@ spring:
               action: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-# Health endpoints for Docker HEALTHCHECK (keep if you use /actuator/health)
 management:
+  server:
+    port: ${MANAGEMENT_PORT:${PORT:8080}}   # ✅ Ensures integer; can use same as PORT
   endpoints:
     web:
       exposure:
         include: health,info
+      base-path: /actuator
   endpoint:
     health:
       probes:
         enabled: true
+      group:
+        db:
+          include: db
+          show-details: when-authorized
 
 # JSONB
 json:
@@ -82,24 +93,23 @@ jwt:
   secret: ${JWT_SECRET:mySecretKey}
   expiration-ms: 86400000 # 24 hours
 
-# RSA keys
-rsa:
-  public-key: classpath:certs/public-key.pem
-  private-key: classpath:certs/private-key.pem
+# RSA keys (disabled for Railway)
+# rsa:
+#   public-key: classpath:certs/public-key.pem
+#   private-key: classpath:certs/private-key.pem
 
-# Logging (quieter + simple pattern)
 logging:
   level:
-    root: warn
-    org.hibernate: warn
-    org.springframework: warn
-    com.planprostructure: info
-    com.zaxxer.hikari: warn
-    org.springframework.jdbc: warn
+    root: info
+    org.hibernate: info
+    org.springframework: info
+    com.planprostructure: debug
+    com.zaxxer.hikari: info
+    org.springframework.jdbc: info
+    org.springframework.boot.autoconfigure: debug
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 
-# File storage (matches Dockerfile path)
 file:
   server-path: /tmp/upload-files/
   client-path: /api/v1/image
@@ -107,7 +117,6 @@ file:
   base-url: ${RAILWAY_STATIC_URL:https://planpro-api-production.up.railway.app}${file.client-path}
   base-image-url: ${RAILWAY_STATIC_URL:https://planpro-api-production.up.railway.app}
 
-# Telegram (quote token; keep secret in env)
 telegram-setting:
   enable: ${TELEGRAM_BOT_ENABLE:false}
   base-url: https://api.telegram.org
@@ -116,7 +125,6 @@ telegram-setting:
   bot-url: https://t.me/${TELEGRAM_BOT_USERNAME:planproapp_bot}
   share-url: https://t.me/${TELEGRAM_BOT_USERNAME:planproapp_bot}
 
-# Swagger / OpenAPI
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
