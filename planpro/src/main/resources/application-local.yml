@@ -2,16 +2,25 @@ server:
   port: 8080
 
 spring:
+  ai:
+    gemini:
+      api-key: AIzaSyBSIVn_HrlfJ-HnD1oQ9qhVhcnXT92OPQI
+      base-url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+      model: gemini-2.0-flash
+      temperature: 0.5
   main:
     allow-bean-definition-overriding: true
   datasource:
-    url: jdbc:postgresql://localhost:5433/db_demo
+    url: jdbc:postgresql://localhost:5433/db_demo?sslmode=disable
     username: postgres
     password: 12345678
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 20000
       maximum-pool-size: 10
+  sql:
+    init:
+      mode: never
   jpa:
     hibernate:
       ddl-auto: update
@@ -29,7 +38,6 @@ spring:
             database:
               action: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-
 
 # JSONB Configuration
 json:
@@ -77,13 +85,13 @@ file:
 
 # Telegram Configuration
 telegram-setting:
-  enable: false  # Disable telegram bot for local development
+  enable: true  # false - Disable telegram bot for local development
   base-url: https://api.telegram.org
   username: planproapp_bot
   access-token: 7845816657:AAEJxT5tVXW88cDYELYli2ttY5glQsJQq7o
   bot-url: https://t.me/planproapp_bot
   share-url: https://t.me/planproapp_bot
-  
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -99,7 +107,7 @@ springdoc:
   api-docs:
     path: /v3/api-docs
     enabled: true
-  show-actuator: false
+  show-actuator: true
   cache:
     disabled: true
   default-consumes-media-type: application/json

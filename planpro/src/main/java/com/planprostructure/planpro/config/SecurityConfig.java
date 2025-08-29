@@ -81,8 +81,7 @@ public class SecurityConfig {
                                 "/swagger-ui.html**",
                                 "/swagger.json",
                                 "/swagger-ui/**",
-                                "/swagger-ui/index.html",
-                                "/api/**"
+                                "/swagger-ui/index.html"
 
                         ).permitAll()
                        .requestMatchers(
@@ -96,7 +95,8 @@ public class SecurityConfig {
                                 "/api/v1/chat/**",
                                 "/api/v1/conversations/**",
                                 "/api/v1/message/**",
-                                "/api/v1/contacts/**"
+                                "/api/v1/contacts/**",  
+                                "/api/wb/v1/reminders/**"
                                 
                        ).authenticated()
                         .anyRequest().authenticated()
