@@ -9,6 +9,8 @@ import com.nimbusds.jose.proc.SecurityContext;
 import com.planprostructure.planpro.properties.RsaKeyProperties;
 import com.planprostructure.planpro.service.auth.UserAuthServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -30,6 +32,7 @@ import org.springframework.web.cors.CorsConfiguration;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@ConditionalOnProperty(prefix = "rsa", name = "private-key")
 public class SecurityConfig {
     private final RsaKeyProperties rsaKeys;
     private final UnauthorizedHandler unauthorizedHandler;
@@ -119,11 +122,13 @@ public class SecurityConfig {
     }
 
     @Bean
+    @Primary
     JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withPublicKey(rsaKeys.publicKey()).build();
     }
 
     @Bean
+    @Primary
     JwtEncoder jwtEncoder() {
         JWK jwk = new RSAKey.Builder(rsaKeys.publicKey())
                 .privateKey(rsaKeys.privateKey())

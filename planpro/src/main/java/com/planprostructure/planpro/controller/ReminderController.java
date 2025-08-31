@@ -11,7 +11,6 @@ import com.planprostructure.planpro.components.common.api.ProPlanRestController;
 import com.planprostructure.planpro.payload.MultiSortBuilder;
 import com.planprostructure.planpro.payload.reminder.ReminderRequest;
 import com.planprostructure.planpro.service.reminder.ReminderService;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +23,7 @@ public class ReminderController extends ProPlanRestController {
     private final ReminderService reminderService;
 
     @GetMapping
-    public Object getPageContent(
+    public Object getListReminder(
             @RequestParam(name = "page_number", defaultValue = "0") Integer pageNumber,
             @RequestParam(name = "page_size", defaultValue = "10") Integer pageSize,
             @RequestParam(value = "sort_columns", required = false, defaultValue = "id:desc") String sortColumns

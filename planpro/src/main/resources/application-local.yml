@@ -11,8 +11,8 @@ spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-    url: jdbc:postgresql://localhost:5433/db_demo?sslmode=disable
-    username: postgres
+    url: jdbc:postgresql://localhost:5432/wecom?sslmode=disable
+    username: mac_pg
     password: 12345678
     driver-class-name: org.postgresql.Driver
     hikari:
@@ -60,9 +60,9 @@ jwt:
   expirationMs: 86400000 # 24 hours in milliseconds
 
 # RSA Keys Configuration
-rsa:
-  public-key: classpath:certs/public-key.pem
-  private-key: classpath:certs/private-key.pem
+# rsa:
+#   public-key: classpath:certs/public-key.pem
+#   private-key: classpath:certs/private-key.pem
 
 # Logging Configuration
 logging:

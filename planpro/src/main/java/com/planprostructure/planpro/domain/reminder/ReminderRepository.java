@@ -4,10 +4,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 import com.planprostructure.planpro.payload.reminder.IGetReminder;
 
-@Repository
 public interface ReminderRepository extends JpaRepository<Reminder, Long> {
     @Query(value="""
            SELECT  
@@ -16,19 +14,19 @@ public interface ReminderRepository extends JpaRepository<Reminder, Long> {
                 rm.description, 
                 rm.due_date, 
                 rm.due_time, 
-                rm.recurrence_type, 
-                rm.category, 
-                rm.created_at, 
-                rm.last_modified, 
-                rm.status, 
-                rm.is_starred, 
-                rm.priority, 
-                rm.tags,
+                rm.recurrence_type as recurrence_type, 
+                rm.category as category, 
+                rm.created_at as created_at, 
+                rm.last_modified as last_modified, 
+                rm.status as reminder_status , 
+                rm.is_starred as is_starred, 
+                rm.priority as priority, 
+                rm.tags as tags,
                 rm.user_id AS user_id,
                 rm.trip_id,
                 rm.note_id,
                 rm.telegram_user_id,
-                rm.is_recurring
+                rm.is_recurring as is_recurring
                 FROM 
                 tb_reminder rm
                 WHERE 

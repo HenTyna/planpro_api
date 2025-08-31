@@ -23,9 +23,9 @@ public interface IGetReminder {
     String getCreatedAt();
     @Value("#{target.last_modified}")
     String getLastModified();
-    @Value("#{target.status}")
+    @Value("#{target.reminder_status}")
     String getStatus();
-    @Value("#{target.starred}")
+    @Value("#{target.is_starred}")
     Boolean getStarred();
     @Value("#{target.recurrence_type}")
     String getRecurrenceType();

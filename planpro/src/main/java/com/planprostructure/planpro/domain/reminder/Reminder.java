@@ -12,13 +12,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Table;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Table(name = "tb_reminder")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
+@Entity
 public class Reminder {
 
     @Id

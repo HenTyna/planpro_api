@@ -8,6 +8,7 @@ import com.nimbusds.jose.proc.SecurityContext;
 import com.planprostructure.planpro.service.auth.UserAuthServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -32,7 +33,7 @@ import javax.crypto.spec.SecretKeySpec;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@ConditionalOnMissingBean(name = "rsaKeyProperties")
+@ConditionalOnProperty(prefix = "rsa", name = "private-key", havingValue = "false", matchIfMissing = true)
 public class SecurityConfigFallback {
     private final UnauthorizedHandler unauthorizedHandler;
     private final AccessDeniedHandler accessDeniedHandler;
@@ -111,6 +112,7 @@ public class SecurityConfigFallback {
     }
 
     @Bean
+    @Primary
     JwtDecoder jwtDecoder() {
         // Use a simple secret key for JWT decoding
         String secret = "your-secret-key-here-make-it-long-enough-for-hs256-algorithm";
@@ -119,6 +121,7 @@ public class SecurityConfigFallback {
     }
 
     @Bean
+    @Primary
     JwtEncoder jwtEncoder() {
         // Use a simple secret key for JWT encoding
         String secret = "your-secret-key-here-make-it-long-enough-for-hs256-algorithm";

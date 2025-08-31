@@ -5,13 +5,12 @@ import java.util.List;
 import com.planprostructure.planpro.enums.RecurrenceType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 public class ReminderRequest {
     private Long userId;
