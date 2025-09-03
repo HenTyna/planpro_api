@@ -10,7 +10,7 @@ restartPolicyMaxRetries = 10
 # This service definition tells Railway how to run and check the health of your app
 [[services]]
 name = "web"
-$default = true
+default = true
 
 [services.env]
 PORT = "8080"
