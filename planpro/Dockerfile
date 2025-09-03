@@ -2,46 +2,27 @@
 FROM gradle:8.5-jdk17 AS builder
 WORKDIR /app
 
-# Cache Gradle deps better by copying metadata first
-COPY gradle gradle
-COPY gradlew settings.gradle build.gradle ./
-RUN chmod +x gradlew && ./gradlew --no-daemon dependencies || true
+# Copy the source code and the Gradle files
+COPY build.gradle* settings.gradle* ./
+COPY src ./src
 
-# Now bring in sources
-COPY . .
-RUN ./gradlew clean bootJar -x test --no-daemon
+# Grant execute permission for the Gradle Wrapper (if you use it)
+# RUN chmod +x gradlew
+
+# Build the project and create the JAR, skipping tests
+# Use ./gradlew if you use the wrapper, or just 'gradle' if you don't.
+RUN gradle clean build -x test
 
 # ---------- Runtime stage ----------
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# Install curl for health checks
-RUN apk add --no-cache curl
-
-# Create the directory your app actually uses (matches application.yml)
-RUN mkdir -p /tmp/upload-files/temp_qr
-
-# Copy the fat jar
+# Copy the built JAR from the builder stage
+# The JAR path might vary. Check your build.gradle to see the 'libs' directory name.
 COPY --from=builder /app/build/libs/*.jar app.jar
 
-# Copy startup script
-COPY startup.sh startup.sh
-RUN chmod +x startup.sh
-
-# Do NOT rely on env in EXPOSE; it's a build-time hint only
+# Expose the port your app runs on
 EXPOSE 8080
 
-# JVM tuned for Railway's memory constraints
-# Railway typically provides 512MB-1GB RAM, so we need to be conservative
-# Note: JAVA_TOOL_OPTIONS will be set by startup.sh
-
-# Set default port for Railway
-ENV PORT=8080
-
-# Healthcheck for Railway
-HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-  CMD curl -f http://localhost:${PORT:-8080}/actuator/health || exit 1
-
-# Run on the port Railway provides (fallback 8080 locally)
-# Use exec form for better signal handling
-ENTRYPOINT ["./startup.sh"]
+# The command to run your application
+ENTRYPOINT ["java", "-jar", "app.jar"]

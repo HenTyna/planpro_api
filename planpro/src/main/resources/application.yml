@@ -1,12 +1,12 @@
-spring:
-  profiles:
-    active: local
-    include: quartz
-  main:
-    allow-circular-references: true
-jwt:
-  expiration: 2h
+# spring:
+#   profiles:
+#     active: railway
+#     include: quartz
+#   main:
+#     allow-circular-references: true
+# jwt:
+#   expiration: 2h
 
-rsa:
-  public-key: classpath:certs/public-key.pem
-  private-key: classpath:certs/private-key.pem
+# rsa:
+#   public-key: classpath:certs/public-key.pem
+#   private-key: classpath:certs/private-key.pem

@@ -2,81 +2,30 @@ server:
   port: ${PORT:8080}   # Railway auto-injects PORT environment variable
 
 spring:
+  config:
+    activate:
+      on-profile: railway
   datasource:
-    # Railway PostgreSQL with SSL (falls back to PROD_* vars if DATABASE_URL is missing)
-    url: ${DATABASE_URL:jdbc:postgresql://${PROD_DB_HOST:localhost}:${PROD_DB_PORT:5432}/${PROD_DB_NAME:postgres}?sslmode=require&sslfactory=org.postgresql.ssl.NonValidatingFactory&tcpKeepAlive=true&socketTimeout=30&connectTimeout=30}
-    username: ${PROD_DB_USERNAME:postgres}
-    password: ${PROD_DB_PASSWORD:}
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      fail-fast: false
-      maximum-pool-size: 2   # small pool for Railway
-      minimum-idle: 0
-      connection-timeout: 10000
-      idle-timeout: 300000        # 5m
-      max-lifetime: 600000        # 10m
-      keepalive-time: 60000       # 1m
-      leak-detection-threshold: 30000
-      connection-test-query: SELECT 1
-      validation-timeout: 3000
-      register-mbeans: false
-      initialization-fail-timeout: 10000
-
-  main:
-    allow-bean-definition-overriding: true
-    lazy-initialization: true
-    banner-mode: console
-    web-application-type: servlet
-
-  sql:
-    init:
-      mode: never
-
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/postgres} # Railway provides the full URL
+    username: ${DATABASE_USERNAME:postgres} # Use Railway's provided variables
+    password: ${DATABASE_PASSWORD:}
   jpa:
     hibernate:
-      ddl-auto: validate
-    show-sql: false
+      ddl-auto: update
     properties:
       hibernate:
-        format_sql: false
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        jdbc:
-          lob:
-            non_contextual_creation: true
-          batch_size: 5
-          batch_versioned_data: true
-        connection:
-          provider_disables_autocommit: true
-        order_inserts: true
-        order_updates: true
-        batch_fetch_style: DYNAMIC
-        cache:
-          use_second_level_cache: false
-          use_query_cache: false
-      javax:
-        persistence:
-          schema-generation:
-            database:
-              action: update
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
 
+# Actuator endpoints
 management:
-  server:
-    port: ${MANAGEMENT_PORT:${PORT:8080}}   # ✅ Ensures integer; can use same as PORT
   endpoints:
     web:
       exposure:
-        include: health,info
-      base-path: /actuator
+        include: health, info, env
   endpoint:
     health:
-      probes:
-        enabled: true
-      group:
-        db:
-          include: db
-          show-details: when-authorized
-
+      show-details: always
 # JSONB
 json:
   mapping:

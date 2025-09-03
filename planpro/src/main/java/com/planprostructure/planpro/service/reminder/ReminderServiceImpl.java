@@ -12,15 +12,12 @@ import com.planprostructure.planpro.domain.reminder.ReminderRepository;
 import com.planprostructure.planpro.domain.telegramBot.TelegramBotUserRepository;
 import com.planprostructure.planpro.domain.trips.TripsRepository;
 import com.planprostructure.planpro.domain.users.UserRepository;
-import com.planprostructure.planpro.enums.RecurrenceType;
 import com.planprostructure.planpro.helper.AuthHelper;
 import com.planprostructure.planpro.payload.reminder.IGetReminder;
 import com.planprostructure.planpro.payload.reminder.ReminderRequest;
 import com.planprostructure.planpro.payload.reminder.ReminderResponse;
-import com.planprostructure.planpro.payload.trips.MainResponse;
 import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -76,7 +73,7 @@ public class ReminderServiceImpl implements ReminderService {
            .status(Status.NORMAL)
            .isStarred(reminderRequest.isStarred())
            .priority(reminderRequest.getPriority())
-        //    .tags(reminderRequest.getTags().stream().collect(Collectors.joining(",")))
+           .tags(reminderRequest.getTags().toString())
            .reminderStatus(reminderRequest.getReminderStatus())
            .build();
 
@@ -92,14 +89,14 @@ public class ReminderServiceImpl implements ReminderService {
         reminder.get().setDescription(reminderRequest.getDescription());
         reminder.get().setDueDate(reminderRequest.getDueDate());
         reminder.get().setDueTime(reminderRequest.getDueTime());
-        reminder.get().setRecurrenceType(RecurrenceType.fromValue(reminderRequest.getRecurrenceType().getValue()));
+        reminder.get().setRecurrenceType(reminderRequest.getRecurrenceType());
         reminder.get().setCategory(reminderRequest.getCategory());
         reminder.get().setCreatedAt(reminderRequest.getCreatedAt());
         reminder.get().setLastModified(reminderRequest.getLastModified());
         reminder.get().setStatus(Status.NORMAL);
         reminder.get().setStarred(reminderRequest.isStarred());
         reminder.get().setPriority(reminderRequest.getPriority());
-        // reminder.get().setTags(reminderRequest.getTags().stream().collect(Collectors.joining(",")));
+        reminder.get().setTags(reminderRequest.getTags().toString());
         reminder.get().setReminderStatus(reminderRequest.getReminderStatus());
         reminderRepository.save(reminder.get());
         logger.info("Reminder updated successfully for userId {}", reminder.get().getUserId());
@@ -136,12 +133,12 @@ public class ReminderServiceImpl implements ReminderService {
                    .dueTime(reminder.getDueTime())
                    .category(reminder.getCategory())
                    .priority(reminder.getPriority())
-                //    .tags(reminder.getTags())
+                   .tags(reminder.getTags())
                    .createdAt(reminder.getCreatedAt())
                    .lastModified(reminder.getLastModified())
                    .status(Status.fromValue(reminder.getStatus()) != null ? Status.fromValue(reminder.getStatus()).getLabel() : Status.NORMAL.getLabel())
                    .isRecurring(reminder.getIsRecurring())
-                   .recurrenceType(RecurrenceType.fromValue(reminder.getRecurrenceType()) != null ? RecurrenceType.fromValue(reminder.getRecurrenceType()).getLabel() : null)
+                   .recurrenceType(reminder.getRecurrenceType())
                    .isStarred(reminder.getStarred() != null ? reminder.getStarred() : false)
                    .userId(reminder.getUserId())
                    .tripId(reminder.getTripId())

@@ -1,13 +1,25 @@
 [build]
-builder = "dockerfile"
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
 
 [deploy]
 startCommand = "java -jar app.jar"
-healthcheckPath = "/actuator/health"
-healthcheckTimeout = 600
-restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 5
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
 
-[deploy.envs]
-JAVA_TOOL_OPTIONS = "-XX:+UseContainerSupport -XX:MaxRAMPercentage=40 -XX:MinRAMPercentage=20 -XX:+ExitOnOutOfMemoryError -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+UseStringDeduplication -XX:+OptimizeStringConcat -Dfile.encoding=UTF-8 -Dspring.profiles.active=railway"
-SPRING_PROFILES_ACTIVE = "railway"
+# This service definition tells Railway how to run and check the health of your app
+[[services]]
+name = "web"
+$default = true
+
+[services.env]
+PORT = "8080"
+
+[services.http]
+path = "/"
+port = 8080
+healthyPath = "/actuator/health" # Crucial for Railway to know your app is live
+healthyTimeout = 10
+healthyInterval = 30
+unhealthyTimeout = 10
+unhealthyInterval = 30

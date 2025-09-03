@@ -30,7 +30,7 @@ public class ReminderRequest {
     
     private String createdAt;
     private String lastModified;
-    private RecurrenceType recurrenceType;
+    private String recurrenceType;
     
     @JsonProperty("starred")  
     private boolean isStarred;
@@ -39,7 +39,7 @@ public class ReminderRequest {
     private String reminderStatus;
 
     @Builder
-    public ReminderRequest(Long userId, Long tripId, Long noteId, Long telegramUserId, String title, String description, String dueDate, String dueTime, String category, String priority, String status, boolean isRecurring, String createdAt, String lastModified, RecurrenceType recurrenceType, boolean isStarred, List<String> tags, String reminderStatus) {
+    public ReminderRequest(Long userId, Long tripId, Long noteId, Long telegramUserId, String title, String description, String dueDate, String dueTime, String category, String priority, String status, boolean isRecurring, String createdAt, String lastModified, String recurrenceType, boolean isStarred, List<String> tags, String reminderStatus) {
         this.userId = userId;
         this.tripId = tripId;
         this.noteId = noteId;
