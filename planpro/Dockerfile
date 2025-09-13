@@ -24,10 +24,6 @@ RUN mkdir -p /tmp/upload-files/temp_qr
 # Copy the fat jar
 COPY --from=builder /app/build/libs/*.jar app.jar
 
-# Copy startup script
-COPY startup.sh startup.sh
-RUN chmod +x startup.sh
-
 # Do NOT rely on env in EXPOSE; it's a build-time hint only
 EXPOSE 8080
 
@@ -41,4 +37,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 
 # Run on the port Railway provides (fallback 8080 locally)
 # Use exec form for better signal handling
-ENTRYPOINT ["./startup.sh"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
