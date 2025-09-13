@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: local
+    active: railway
     include: quartz
   main:
     allow-circular-references: true

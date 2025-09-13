@@ -31,16 +31,13 @@ RUN chmod +x startup.sh
 # Do NOT rely on env in EXPOSE; it's a build-time hint only
 EXPOSE 8080
 
-# JVM tuned for Railway's memory constraints
-# Railway typically provides 512MB-1GB RAM, so we need to be conservative
-# Note: JAVA_TOOL_OPTIONS will be set by startup.sh
-
 # Set default port for Railway
 ENV PORT=8080
+ENV SPRING_PROFILES_ACTIVE=railway
 
-# Healthcheck for Railway
-HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-  CMD curl -f http://localhost:${PORT:-8080}/actuator/health || exit 1
+# Healthcheck for Railway (simplified)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 # Run on the port Railway provides (fallback 8080 locally)
 # Use exec form for better signal handling
