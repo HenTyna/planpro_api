@@ -41,7 +41,7 @@ public class Reminder {
     @ColumnDefault("1")
     private Status status;
     private boolean isRecurring;
-    private RecurrenceType recurrenceType;
+    private String recurrenceType;
     private boolean isStarred;
     private String createdAt;
     private String lastModified;
@@ -49,7 +49,7 @@ public class Reminder {
     private String reminderStatus;
 
     @Builder
-    public Reminder(Long id, Long userId, Long tripId, Long noteId, Long telegramUserId, String title, String description, String dueDate, String dueTime, String category, String priority, Status status, boolean isRecurring, RecurrenceType recurrenceType, boolean isStarred, String createdAt, String lastModified, String tags, String reminderStatus) {
+    public Reminder(Long id, Long userId, Long tripId, Long noteId, Long telegramUserId, String title, String description, String dueDate, String dueTime, String category, String priority, Status status, boolean isRecurring, String recurrenceType, boolean isStarred, String createdAt, String lastModified, String tags, String reminderStatus) {
         this.id = id;
         this.userId = userId;
         this.tripId = tripId;

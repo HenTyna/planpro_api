@@ -11,4 +11,8 @@ public interface ReminderService {
    void deleteReminder(Long id) throws Throwable;
 
    Object getListReminder(Pageable pageRequest) throws Throwable;
+
+   void markAsDone(Long id, boolean isDone) throws Throwable;
+
+   void markAsIsStarred(Long id, boolean isStarred) throws Throwable;
 }

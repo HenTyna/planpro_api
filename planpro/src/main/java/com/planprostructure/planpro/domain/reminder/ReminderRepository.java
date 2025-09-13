@@ -18,7 +18,7 @@ public interface ReminderRepository extends JpaRepository<Reminder, Long> {
                 rm.category as category, 
                 rm.created_at as created_at, 
                 rm.last_modified as last_modified, 
-                rm.status as reminder_status , 
+                rm.reminder_status as reminder_status , 
                 rm.is_starred as is_starred, 
                 rm.priority as priority, 
                 rm.tags as tags,

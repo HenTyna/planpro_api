@@ -51,4 +51,15 @@ public class ReminderController extends ProPlanRestController {
         return ok();
     }
     
+    @PutMapping("/mark-as-done/{id}")
+    public Object markAsDone(@PathVariable Long id, @RequestBody boolean isDone) throws Throwable {
+        reminderService.markAsDone(id, isDone);
+        return ok();
+    }
+    
+    @PutMapping("/mark-as-starred/{id}")
+    public Object markAsStarred(@PathVariable Long id, @RequestBody boolean isStarred) throws Throwable {
+        reminderService.markAsIsStarred(id, isStarred);
+        return ok();
+    }
 }

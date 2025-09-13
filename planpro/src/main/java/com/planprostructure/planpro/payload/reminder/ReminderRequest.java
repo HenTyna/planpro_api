@@ -1,8 +1,5 @@
 package com.planprostructure.planpro.payload.reminder;
 
-import java.util.List;
-
-import com.planprostructure.planpro.enums.RecurrenceType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,16 +27,16 @@ public class ReminderRequest {
     
     private String createdAt;
     private String lastModified;
-    private RecurrenceType recurrenceType;
+    private String recurrenceType;
     
     @JsonProperty("starred")  
     private boolean isStarred;
     
-    private List<String> tags;
+    private String tags; // Comma-separated list of tags
     private String reminderStatus;
 
     @Builder
-    public ReminderRequest(Long userId, Long tripId, Long noteId, Long telegramUserId, String title, String description, String dueDate, String dueTime, String category, String priority, String status, boolean isRecurring, String createdAt, String lastModified, RecurrenceType recurrenceType, boolean isStarred, List<String> tags, String reminderStatus) {
+    public ReminderRequest(Long userId, Long tripId, Long noteId, Long telegramUserId, String title, String description, String dueDate, String dueTime, String category, String priority, String status, boolean isRecurring, String createdAt, String lastModified, String recurrenceType, boolean isStarred, String tags, String reminderStatus) {
         this.userId = userId;
         this.tripId = tripId;
         this.noteId = noteId;
@@ -56,7 +53,7 @@ public class ReminderRequest {
         this.lastModified = lastModified;
         this.recurrenceType = recurrenceType;
         this.isStarred = isStarred;
-        this.tags = tags;
+        this.tags = tags; // Comma-separated list of tags
         this.reminderStatus = reminderStatus;
     }
 }
