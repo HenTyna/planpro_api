@@ -3,11 +3,6 @@ server:
 
 spring:
   datasource:
-    # Railway PostgreSQL with SSL (falls back to PROD_* vars if DATABASE_URL is missing)
-    url: ${DATABASE_URL:jdbc:postgresql://${PROD_DB_HOST:localhost}:${PROD_DB_PORT:5432}/${PROD_DB_NAME:postgres}?sslmode=require&sslfactory=org.postgresql.ssl.NonValidatingFactory&tcpKeepAlive=true&socketTimeout=30&connectTimeout=30}
-    username: ${PROD_DB_USERNAME:postgres}
-    password: ${PROD_DB_PASSWORD:}
-    driver-class-name: org.postgresql.Driver
     hikari:
       fail-fast: false
       maximum-pool-size: 2   # small pool for Railway
