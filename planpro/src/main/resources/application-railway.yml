@@ -3,6 +3,11 @@ server:
 
 spring:
   datasource:
+    # Fallback configuration if Java config doesn't work
+    url: ${DATABASE_URL:jdbc:postgresql://${PGHOST:localhost}:${PGPORT:5432}/${PGDATABASE:postgres}?tcpKeepAlive=true&socketTimeout=30&connectTimeout=30}
+    username: ${PGUSER:postgres}
+    password: ${PGPASSWORD:}
+    driver-class-name: org.postgresql.Driver
     hikari:
       fail-fast: false
       maximum-pool-size: 2   # small pool for Railway

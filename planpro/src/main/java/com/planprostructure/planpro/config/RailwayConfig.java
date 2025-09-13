@@ -45,9 +45,16 @@ public class RailwayConfig {
             int port = dbUri.getPort();
             String database = dbUri.getPath().substring(1); // Remove leading slash
             
-            // Build JDBC URL with proper SSL settings for Railway
+            // Replace internal hostname with external hostname for Railway
+            if (host.contains("railway.internal")) {
+                host = host.replace("railway.internal", "railway.app");
+            }
+            
+            // Build JDBC URL with proper settings for Railway
             String jdbcUrl = String.format("jdbc:postgresql://%s:%d/%s?tcpKeepAlive=true&socketTimeout=30&connectTimeout=30", 
                 host, port, database);
+            
+            System.out.println("Connecting to database: " + jdbcUrl);
             
             return DataSourceBuilder.create()
                 .url(jdbcUrl)
@@ -59,5 +66,27 @@ public class RailwayConfig {
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse DATABASE_URL: " + databaseUrl, e);
         }
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "PGHOST")
+    public DataSource dataSourceFromEnv(
+            @Value("${PGHOST}") String host,
+            @Value("${PGPORT:5432}") int port,
+            @Value("${PGDATABASE}") String database,
+            @Value("${PGUSER}") String username,
+            @Value("${PGPASSWORD}") String password) {
+        
+        String jdbcUrl = String.format("jdbc:postgresql://%s:%d/%s?tcpKeepAlive=true&socketTimeout=30&connectTimeout=30", 
+            host, port, database);
+        
+        System.out.println("Connecting to database using PGHOST: " + jdbcUrl);
+        
+        return DataSourceBuilder.create()
+            .url(jdbcUrl)
+            .username(username)
+            .password(password)
+            .driverClassName("org.postgresql.Driver")
+            .build();
     }
 }
