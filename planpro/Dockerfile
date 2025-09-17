@@ -24,7 +24,7 @@ COPY src src
 RUN ./gradlew build -x test --no-daemon
 
 # Expose port (Railway will set PORT environment variable)
-EXPOSE 8080
+EXPOSE 8088
 
 # Run the application
 CMD ["java", "-jar", "build/libs/planpro-0.0.1-SNAPSHOT.jar"]

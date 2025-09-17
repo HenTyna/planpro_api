@@ -8,5 +8,5 @@ healthcheckTimeout = 100
 restartPolicyType = "on_failure"
 
 [env]
-PORT = "8080"
+PORT = "8088"
 SPRING_PROFILES_ACTIVE = "prod"
