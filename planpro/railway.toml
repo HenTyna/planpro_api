@@ -2,12 +2,11 @@
 builder = "dockerfile"
 
 [deploy]
-startCommand = "java -jar app.jar"
+startCommand = "java -jar build/libs/planpro-0.0.1-SNAPSHOT.jar"   
 healthcheckPath = "/actuator/health"
-healthcheckTimeout = 300
+healthcheckTimeout = 100
 restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 3
 
-[deploy.envs]
-SPRING_PROFILES_ACTIVE = "railway"
-JAVA_TOOL_OPTIONS = "-XX:+UseContainerSupport -XX:MaxRAMPercentage=50 -XX:MinRAMPercentage=25 -XX:+ExitOnOutOfMemoryError -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+UseStringDeduplication -XX:+OptimizeStringConcat -Dfile.encoding=UTF-8"
+[env]
+PORT = "8080"
+SPRING_PROFILES_ACTIVE = "prod"
