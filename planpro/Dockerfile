@@ -17,7 +17,7 @@ RUN chmod +x ./gradlew
 COPY src src
 
 # Build the application
-RUN ./gradlew build -x test
+RUN ./gradlew build -x test --no-daemon
 
 # Expose port (Railway will set PORT environment variable)
 EXPOSE 8080
