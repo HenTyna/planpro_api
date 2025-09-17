@@ -4,6 +4,10 @@ FROM openjdk:21-jdk-slim
 # Set working directory
 WORKDIR /app
 
+# Set environment variables for Java
+ENV JAVA_HOME=/usr/local/openjdk-21
+ENV PATH=$JAVA_HOME/bin:$PATH
+
 # Copy gradle wrapper and build files
 COPY gradlew .
 COPY gradle gradle
